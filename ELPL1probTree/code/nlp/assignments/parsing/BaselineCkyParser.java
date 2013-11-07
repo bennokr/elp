@@ -256,8 +256,37 @@ import nlp.util.CounterMap;
 		/*
 		 * Add method which uses the annotatedTree (not the 'tree') and compute the log probability of the tree
 		 */
+		double logScore = 0;
 		
-		return Double.NaN;
+		if (annotatedTree.isLeaf()){
+			System.out.println("A unary tree has no log score");
+			return 0; //something
+		}
+		
+		else{
+			List<Tree<String>> children = annotatedTree.getChildren();
+			if (children.size()==1){	//unary rule
+				logScore += getLogScoreUnary(children.get(0));
+			}
+			else{						//binary rule
+				for (Tree<String> babytree : children){
+					logScore += getLogScoreBinary(babytree);
+				}
+			}
+			
+			
+		}
+		return logScore;
+	}
+
+	private double getLogScoreBinary(Tree<String> babytree) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	private double getLogScoreUnary(Tree<String> tree) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 	

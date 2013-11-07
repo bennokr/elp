@@ -138,7 +138,7 @@ public class PCFGParserTester {
       Tree<String> normalizedTree = treeTransformer.transformTree(tree);
       if (normalizedTree.getYield().size() > maxLength)
         continue;
-//      System.out.println(Trees.PennTreeRenderer.render(normalizedTree));
+      System.out.println(Trees.PennTreeRenderer.render(normalizedTree));
       normalizedTreeList.add(normalizedTree);
     }
     return normalizedTreeList;
