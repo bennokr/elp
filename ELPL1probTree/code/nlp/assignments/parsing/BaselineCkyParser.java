@@ -279,7 +279,7 @@ import nlp.util.CounterMap;
 		return logScore;
 	}
 
-	private double getLogScoreBinary(Tree<String> babytree) {
+	private double getLogScoreBinary(Tree<String> tree) {
 		// TODO Auto-generated method stub
 		return 0;
 	}
