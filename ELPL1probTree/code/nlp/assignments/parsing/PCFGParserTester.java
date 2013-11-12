@@ -25,9 +25,9 @@ public class PCFGParserTester {
     
     // you may want to change this for initial annotation experiments (e.g., maxTrainLength = 10) so that to make debugging
     // the annotation process easier
-    //int maxTrainLength = 1000;   // this is the standard setting (e.g., to compare with the previous work) 
+//    int maxTrainLength = 1000;   // this is the standard setting (e.g., to compare with the previous work) 
     int maxTrainLength = 20;  // use if for time/memory constraints cannot use the default setting  
-    //int maxTestLength = 40; // this is the standard setting (e.g., to compare with the previous work) 
+//    int maxTestLength = 40; // this is the standard setting (e.g., to compare with the previous work) 
     int maxTestLength = 20;  // use if for time/memory constraints cannot use the default settingint
     // Please keep the above values (20 / 20) in the versions you submit
     
@@ -73,7 +73,7 @@ public class PCFGParserTester {
       //This is only a subset of the validation set - 393 trees (as used, e.g., in Klein and Manning 2003 for initial experiments)
       //testTrees = readTrees(basePath, 2200, 2219, maxTestLength); // 
       
-      testTrees = readTrees(basePath, 2200, 2299, maxTestLength);  
+      //testTrees = readTrees(basePath, 2200, 2299, maxTestLength);  
       System.out.print("Loading test trees  ... ");
       testTrees = readTrees(basePath, 2300, 2399, maxTestLength);
     }
@@ -101,9 +101,13 @@ public class PCFGParserTester {
     	System.out.println(" Scoring test trees ...");
     	int sentIdx = 0;
     	for (Tree<String> testTree : testTrees) {
+    		try {
     		double logProb = parser.getLogScore(testTree);
     		System.out.println((sentIdx++ ) + ":  logscore =  " + logProb);
     		totLogProb += logProb;
+    		} catch (Exception e) {
+    			System.err.println("error at nr " + sentIdx);
+    		}
     		if (sentIdx > 9) {
     			break;
     		}

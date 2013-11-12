@@ -254,59 +254,70 @@ class BaselineCkyParser implements Parser {
 	public double getLogScore(Tree<String> tree) {
 		Tree<String> annotatedTree = annotator.annotateTree(tree);
 		/*
-		 * Add method which uses the annotatedTree (not the 'tree') and compute the log probability of the tree
+		 * TODO: Add method which uses the annotatedTree (not the 'tree') and compute the log probability of the tree
 		 */
 		double logScore = 0;
 
 		if (annotatedTree.isLeaf()){
 			return 0; //something
-		}
-
-		else{
+		}else {
 			List<Tree<String>> children = annotatedTree.getChildren();
-			int nChildren = children.size();
-
-
 			String inputSymbol = annotatedTree.getLabel(); 		//to recover the rule that was used (should be possible to do easier, by annotations)
-			String[] outputSymbols = new String[nChildren];
 
-			for (int i = 0; i<nChildren; i++){
-				Tree<String> child = children.get(i);
+			for (Tree<String> child : children){
 				logScore += getLogScore(child);					// add the scores of the subtrees
-				outputSymbols[i]=children.get(i).getLabel();
 			}
-
-			logScore += nodeLogScore(inputSymbol, outputSymbols); 	// add the score of this node
+			logScore += nodeLogScore(inputSymbol, children); 	// add the score of this node
 		}
+//		System.err.println("score is now " + logScore);
 		return logScore;
 	}
 
-	private double nodeLogScore(String inputSymbol, String[] outputSymbols) {
+	/** Get the score of the rule used to generate the `outputSymbols` from the `inputSymbol`
+	 * @param inputSymbol String of unknown format?
+	 * @param outputSymbols Array of length 1 or length 2!
+	 * @return
+	 */
+	private double nodeLogScore(String inputSymbol, List<Tree<String>> outputSymbols) {
 
-		double score = Double.NEGATIVE_INFINITY;
-		switch(outputSymbols.length){
+		double score = Double.NEGATIVE_INFINITY;		
+		switch(outputSymbols.size()){
 			case 1: {
+				String child = outputSymbols.get(0).getLabel();
+				if (inputSymbol.equals(child)) {
+					return 0;
+				}
 				List<UnaryRule> possibleRules1 =  grammar.getUnaryRulesByParent(inputSymbol);
 				for (UnaryRule rule : possibleRules1){
-					if (rule.child.equals(outputSymbols[0])){
+					if (rule.child.equals(child)){
 						score = Math.log(rule.score);
+						return score;
 					}
+				}
+				System.err.println("could not find rule: " + inputSymbol  + " to " + child + " in " + possibleRules1.size() + " rules:");
+				for (UnaryRule rule : possibleRules1){
+					System.err.println(" " + rule);
 				}
 				break;
 			}
 			case 2: {
+				String left = outputSymbols.get(0).getLabel();
+				String right = outputSymbols.get(1).getLabel();
 				List<BinaryRule> possibleRules2 = grammar.getBinaryRulesByParent(inputSymbol);
 				for (BinaryRule rule : possibleRules2){
-					if (rule.leftChild.equals(outputSymbols[0])&&rule.rightChild.equals(outputSymbols[1])){
+					if (rule.leftChild.equals(left)&&rule.rightChild.equals(right)){
 						score = Math.log(rule.score);
+						return score;
 					}
 				}
-			break;
+				break;
 			}
 			default: {
+				System.err.println("SHOULD NEVER BE REACHED: length=" + outputSymbols.size());
 				break;
 			}
 		}
+//		System.err.println("nodeLogScore is " + score);
 		return score;
 	}
 
