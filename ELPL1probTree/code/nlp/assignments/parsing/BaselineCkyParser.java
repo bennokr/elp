@@ -286,14 +286,14 @@ class BaselineCkyParser implements Parser {
 
 		double score=0;
 		switch(outputSymbols.length){
-		case 0: List<UnaryRule> possibleRules1 =  grammar.getUnaryRulesByParent(inputSymbol);
+		case 1: List<UnaryRule> possibleRules1 =  grammar.getUnaryRulesByParent(inputSymbol);
 				for (UnaryRule rule : possibleRules1){
 					if (rule.child.equals(outputSymbols[0])){
 						score = Math.log(rule.score);
 					}
 				}
 				break;
-		case 1: List<BinaryRule> possibleRules2 = grammar.getBinaryRulesByParent(inputSymbol);
+		case 2: List<BinaryRule> possibleRules2 = grammar.getBinaryRulesByParent(inputSymbol);
 				for (BinaryRule rule : possibleRules2){
 					if (rule.leftChild.equals(outputSymbols[0])&&rule.rightChild.equals(outputSymbols[1])){
 						score = Math.log(rule.score);
