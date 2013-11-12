@@ -289,7 +289,7 @@ class BaselineCkyParser implements Parser {
 		case 0: List<UnaryRule> possibleRules1 =  grammar.getUnaryRulesByParent(inputSymbol);
 				for (UnaryRule rule : possibleRules1){
 					if (rule.child.equals(outputSymbols[0])){
-						score = rule.score;
+						score = Math.log(rule.score);
 					}
 				}
 				break;
