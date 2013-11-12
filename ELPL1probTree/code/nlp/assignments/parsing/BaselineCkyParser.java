@@ -284,25 +284,30 @@ class BaselineCkyParser implements Parser {
 
 	private double nodeLogScore(String inputSymbol, String[] outputSymbols) {
 
-		double score=0;
+		double score = Double.NEGATIVE_INFINITY;
 		switch(outputSymbols.length){
-		case 1: List<UnaryRule> possibleRules1 =  grammar.getUnaryRulesByParent(inputSymbol);
+			case 1: {
+				List<UnaryRule> possibleRules1 =  grammar.getUnaryRulesByParent(inputSymbol);
 				for (UnaryRule rule : possibleRules1){
 					if (rule.child.equals(outputSymbols[0])){
 						score = Math.log(rule.score);
 					}
 				}
 				break;
-		case 2: List<BinaryRule> possibleRules2 = grammar.getBinaryRulesByParent(inputSymbol);
+			}
+			case 2: {
+				List<BinaryRule> possibleRules2 = grammar.getBinaryRulesByParent(inputSymbol);
 				for (BinaryRule rule : possibleRules2){
 					if (rule.leftChild.equals(outputSymbols[0])&&rule.rightChild.equals(outputSymbols[1])){
 						score = Math.log(rule.score);
 					}
-				}		
+				}
+			break;
+			}
+			default: {
 				break;
-		default: break;
+			}
 		}
-		// TODO Auto-generated method stub
 		return score;
 	}
 
