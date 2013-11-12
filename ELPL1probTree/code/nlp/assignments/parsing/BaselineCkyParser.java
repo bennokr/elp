@@ -259,7 +259,7 @@ class BaselineCkyParser implements Parser {
 		double logScore = 0;
 
 		if (annotatedTree.isLeaf()){
-			System.out.println("A unary tree has no log score");
+			System.out.println("A leaf has no log score");
 			return 0; //something
 		}
 
