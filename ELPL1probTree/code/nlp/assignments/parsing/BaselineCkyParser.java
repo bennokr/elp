@@ -277,12 +277,12 @@ class BaselineCkyParser implements Parser {
 				outputSymbols[i]=children.get(i).getLabel();
 			}
 
-			logScore += nodeScore(inputSymbol, outputSymbols); 	// add the score of this node
+			logScore += nodeLogScore(inputSymbol, outputSymbols); 	// add the score of this node
 		}
 		return logScore;
 	}
 
-	private double nodeScore(String inputSymbol, String[] outputSymbols) {
+	private double nodeLogScore(String inputSymbol, String[] outputSymbols) {
 
 		double score=0;
 		switch(outputSymbols.length){
@@ -296,7 +296,7 @@ class BaselineCkyParser implements Parser {
 		case 1: List<BinaryRule> possibleRules2 = grammar.getBinaryRulesByParent(inputSymbol);
 				for (BinaryRule rule : possibleRules2){
 					if (rule.leftChild.equals(outputSymbols[0])&&rule.rightChild.equals(outputSymbols[1])){
-						score = rule.score;
+						score = Math.log(rule.score);
 					}
 				}		
 				break;
