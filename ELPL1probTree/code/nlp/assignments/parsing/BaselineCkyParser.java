@@ -249,42 +249,116 @@ class BaselineCkyParser implements Parser {
 	}
 
 
+	public double getLogScore(Tree<String> tree){
+		Tree<String> annotatedTree = annotator.annotateTree(tree);
+		return logScoreHelper(annotatedTree);
+	}
 
+	private double logScoreHelper(Tree<String> tree) {
+		List<Tree<String>> children = tree.getChildren();
+		String output="";		
+		if (children.size()>0){output = children.get(0).getLabel();}
+		double logScore;
+		if (tree.isPreTerminal()){
+			if (lexicon.isKnown(output)){
+				System.out.println(lexicon.scoreTagging(tree.getLabel(), output));
+				logScore = Math.log(lexicon.scoreTagging(tree.getLabel(), output));
+			}
+			else{
+				logScore = Double.NEGATIVE_INFINITY; //unknown word: -infinity?
+			}
+		}
+		else{ //add the scores of the children 
+			logScore = 0;
+			for (Tree<String> child : children){
+				logScore += logScoreHelper(child);
+			}
+			// and the score of this node
+			String inputSymbol = tree.getLabel();
+			switch(children.size()){
+			case 0: {
+				System.err.println("logScoreHelper called for leaf");
+				logScore = 0; //We're at a leaf somehow, return no score
+				break;
+			}			
+			case 1:{
+				if (inputSymbol.equals(output)) { //reflexivity, prob = 1 so logprob is 0
+					logScore += 0;
+				}
+				else{
+					List<UnaryRule> possibleRules1 =  grammar.getUnaryRulesByParent(inputSymbol);
+					for (UnaryRule rule : possibleRules1){
+						if (rule.child.equals(output)){
+							logScore += Math.log(rule.score);
+						}
+					}
+				}
+				break;
+			}
+			case 2:{
+				String outputL = output;
+				String outputR = children.get(1).getLabel();
+				List<BinaryRule> possibleRules2 =  grammar.getBinaryRulesByParent(inputSymbol);
+				for (BinaryRule rule : possibleRules2){
+					if (rule.leftChild.equals(outputL) & rule.rightChild.equals(outputR)){
+						logScore += Math.log(rule.score);
+					}
+				}
+				break;
+			}
+			default:{System.err.println("logScoreHelper called for non-binary tree");}
+			}
+		}
+		return logScore;
+	}
+
+	/*
 	@Override
 	public double getLogScore(Tree<String> tree) {
 		Tree<String> annotatedTree = annotator.annotateTree(tree);
-		/*
-		 * TODO: Add method which uses the annotatedTree (not the 'tree') and compute the log probability of the tree
-		 */
+
+	 * TODO: Add method which uses the annotatedTree (not the 'tree') and compute the log probability of the tree
+
 		double logScore = 0;
 
 		if (annotatedTree.isLeaf()){
 			return 0; //something
 		}else {
 			List<Tree<String>> children = annotatedTree.getChildren();
-			String inputSymbol = annotatedTree.getLabel(); 		//to recover the rule that was used (should be possible to do easier, by annotations)
+			String inputSymbol = annotatedTree.getLabel(); 		// to recover the rule that was used (should be possible to do easier, by annotations)
 
 			for (Tree<String> child : children){
 				logScore += getLogScore(child);					// add the scores of the subtrees
 			}
-			logScore += nodeLogScore(inputSymbol, children); 	// add the score of this node
+
+			logScore += (annotatedTree.isPreTerminal()?
+					lexiconLogScore(inputSymbol,children.get(0).getLabel())
+					:
+					nodeLogScore(inputSymbol, children));
+
+
 		}
 //		System.err.println("score is now " + logScore);
 		return logScore;
 	}
 
-	/** Get the score of the rule used to generate the `outputSymbols` from the `inputSymbol`
+	private double lexiconLogScore(String preterminal, String terminal) {
+		return lexicon.scoreTagging(terminal, preterminal);
+	}
+
+	 *//** Get the score of the rule used to generate the `outputSymbols` from the `inputSymbol`
 	 * @param inputSymbol String of unknown format?
 	 * @param outputSymbols Array of length 1 or length 2!
 	 * @return
-	 */
+	 *//*
 	private double nodeLogScore(String inputSymbol, List<Tree<String>> outputSymbols) {
 
 		double score = Double.NEGATIVE_INFINITY;		
 		switch(outputSymbols.size()){
 			case 1: {
 				String child = outputSymbols.get(0).getLabel();
-				if (inputSymbol.equals(child)) {
+
+				if (inputSymbol.equals(child)) { //reflexivity, prob = 1 so logprob is 0
 					return 0;
 				}
 				List<UnaryRule> possibleRules1 =  grammar.getUnaryRulesByParent(inputSymbol);
@@ -320,7 +394,7 @@ class BaselineCkyParser implements Parser {
 //		System.err.println("nodeLogScore is " + score);
 		return score;
 	}
-
+	  */
 
 
 

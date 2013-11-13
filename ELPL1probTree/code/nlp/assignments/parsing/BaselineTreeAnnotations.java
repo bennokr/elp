@@ -20,7 +20,11 @@ import nlp.util.Filter;
 	
     @Override
 	public  Tree<String> annotateTree(Tree<String> unAnnotatedTree) {
-      // Currently, the only annotation done is a lossless binarization
+      if (unAnnotatedTree.isBinary()){
+    	  return unAnnotatedTree;
+      }
+    	
+    	// Currently, the only annotation done is a lossless binarization
       // TODO : change the annotation from a lossless binarization to a finite-order markov process (try at least 1st and 2nd order)
       // TODO : mark nodes with the label of their parent nodes, giving a second order vertical markov process
       // TODO : used for marking parents "^" symbol, e.g., for vertical Markovization:  if NP is under NP used NP^VP, in this case

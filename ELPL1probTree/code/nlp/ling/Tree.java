@@ -152,4 +152,14 @@ public class Tree<L> {
     this.label = label;
     this.children = Collections.emptyList();
   }
+public boolean isBinary() {
+	int nChildren = this.children.size();
+	switch (nChildren){
+	case 0: return true;
+	case 1: return children.get(0).isBinary();
+	case 2: return (children.get(0).isBinary()&&children.get(1).isBinary());
+	default: return false;
+	}
+	// TODO Auto-generated method stub
+}
 }
