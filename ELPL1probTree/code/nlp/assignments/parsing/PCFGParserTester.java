@@ -25,10 +25,10 @@ public class PCFGParserTester {
     
     // you may want to change this for initial annotation experiments (e.g., maxTrainLength = 10) so that to make debugging
     // the annotation process easier
-//    int maxTrainLength = 1000;   // this is the standard setting (e.g., to compare with the previous work) 
-    int maxTrainLength = 20;  // use if for time/memory constraints cannot use the default setting  
-//    int maxTestLength = 40; // this is the standard setting (e.g., to compare with the previous work) 
-    int maxTestLength = 20;  // use if for time/memory constraints cannot use the default settingint
+    int maxTrainLength = 1000;   // this is the standard setting (e.g., to compare with the previous work) 
+//    int maxTrainLength = 20;  // use if for time/memory constraints cannot use the default setting  
+    int maxTestLength = 40; // this is the standard setting (e.g., to compare with the previous work) 
+//    int maxTestLength = 20;  // use if for time/memory constraints cannot use the default settingint
     // Please keep the above values (20 / 20) in the versions you submit
     
 

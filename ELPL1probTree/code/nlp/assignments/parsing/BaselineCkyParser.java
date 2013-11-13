@@ -260,13 +260,18 @@ class BaselineCkyParser implements Parser {
 		if (children.size()>0){output = children.get(0).getLabel();}
 		double logScore;
 		if (tree.isPreTerminal()){
-			if (lexicon.isKnown(output)){
-				System.out.println(lexicon.scoreTagging(tree.getLabel(), output));
-				logScore = Math.log(lexicon.scoreTagging(tree.getLabel(), output));
+			logScore = Math.log(lexicon.scoreTagging(tree.getLabel(), output));
+			if (Double.isNaN(logScore)){
+				logScore = 0; // Double.NEGATIVE_INFINITY ?
 			}
-			else{
-				logScore = Double.NEGATIVE_INFINITY; //unknown word: -infinity?
-			}
+		//	System.out.println("Preterminal: "+tree.getLabel() +", output: "+ output);
+		//	System.out.println("Lexiconscore: " +lexicon.scoreTagging(output,tree.getLabel()));
+		//	if (lexicon.isKnown(output.toLowerCase())){				
+		//		logScore = Math.log(lexicon.scoreTagging(tree.getLabel(), output));
+		//	}
+		//	else{
+		//		logScore = Double.NEGATIVE_INFINITY; //unknown word: -infinity?
+		//	}
 		}
 		else{ //add the scores of the children 
 			logScore = 0;
@@ -317,7 +322,7 @@ class BaselineCkyParser implements Parser {
 	public double getLogScore(Tree<String> tree) {
 		Tree<String> annotatedTree = annotator.annotateTree(tree);
 
-	 * TODO: Add method which uses the annotatedTree (not the 'tree') and compute the log probability of the tree
+//	 * TODO: Add method which uses the annotatedTree (not the 'tree') and compute the log probability of the tree
 
 		double logScore = 0;
 
@@ -343,10 +348,10 @@ class BaselineCkyParser implements Parser {
 	}
 
 	private double lexiconLogScore(String preterminal, String terminal) {
-		return lexicon.scoreTagging(terminal, preterminal);
+		return Math.log(lexicon.scoreTagging(terminal, preterminal));
 	}
 
-	 *//** Get the score of the rule used to generate the `outputSymbols` from the `inputSymbol`
+	 *//*Get the score of the rule used to generate the `outputSymbols` from the `inputSymbol`
 	 * @param inputSymbol String of unknown format?
 	 * @param outputSymbols Array of length 1 or length 2!
 	 * @return
@@ -394,8 +399,8 @@ class BaselineCkyParser implements Parser {
 //		System.err.println("nodeLogScore is " + score);
 		return score;
 	}
-	  */
+	  
 
-
+*/
 
 }

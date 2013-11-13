@@ -32,6 +32,7 @@ class Lexicon {
 			//return 0;
 		//}
 		//else{
+		word = word.toLowerCase();
 			double p_tag = tagCounter.getCount(tag) / totalTokens;
 			double c_word = wordCounter.getCount(word);
 			double c_tag_and_word = wordToTagCounters.getCount(word, tag);
@@ -52,7 +53,7 @@ class Lexicon {
 			List<String> words = trainTree.getYield();
 			List<String> tags = trainTree.getPreTerminalYield();
 			for (int position = 0; position < words.size(); position++) {
-				String word = words.get(position);
+				String word = words.get(position).toLowerCase();
 				String tag = tags.get(position);
 				tallyTagging(word, tag);
 			}
