@@ -1,12 +1,11 @@
 \documentclass{article}
-\usepackage[a4paper]{geometry}
+\usepackage[margin=1cm,a4paper]{geometry}
 \usepackage{tikz}
 \usetikzlibrary{trees}
 
 \title{Elements of Language Processing and Learning\\
-Lab assignment \\
-Stage 1: Computing the Probability of a Tree\\
-Report}
+Lab assignment report\\
+Stage 1: Computing the Probability of a Tree}
 \author{Benno Kruit, 10576223\\Sara Veldhoen, 10545298}
 
 \begin{document}
@@ -17,9 +16,9 @@ The objective is to compute the probability of a parse tree, e.g. a tree in the 
 
 In general, the probability of a tree is the product of the probabilities of the production rules that would have generated it.
 This includes the the probabilities of the word leaves, which are lexical entries. This is illustrated in Figure 1.
-We actually compute the log probability to avoid arithmetic underflow due to the multiplication of small probabilities. Therefore, in the algorithm we add together the log probabilites.
+We actually compute the log probability to avoid arithmetic underflow due to the multiplication of small probabilities. Therefore, in the algorithm we add together the log probabilities.
 
-\begin{figure}
+\begin{figure}[h]
 \input{figureTree}
 \end{figure}
 
