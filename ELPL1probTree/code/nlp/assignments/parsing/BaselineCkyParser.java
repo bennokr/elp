@@ -1,6 +1,7 @@
 package nlp.assignments.parsing;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -257,18 +258,17 @@ class BaselineCkyParser implements Parser {
 	private double logScoreHelper(Tree<String> tree) {
 		List<Tree<String>> children = tree.getChildren();
 		if (children.size()>0){
-			double logScore;
+			double logScore = 0;
 			String output = children.get(0).getLabel();
-
+			boolean found = false;
 			if (tree.isPreTerminal()){
-				logScore = Math.log(lexicon.scoreTagging(output, tree.getLabel()));
-				if (Double.isNaN(logScore)){
-					System.out.println("   Lexicon unknown: '" + tree.getLabel() + "' for '" + output + "'");
-					logScore = Double.NEGATIVE_INFINITY;
+				double score = lexicon.scoreTagging(output, tree.getLabel());
+				if (!Double.isNaN(score)){
+					logScore += Math.log(score);
+					found = true;
 				}
 			}
 			else{ //add the scores of the children 
-				logScore = 0;
 				for (Tree<String> child : children){
 					logScore += logScoreHelper(child);
 				}
@@ -284,8 +284,10 @@ class BaselineCkyParser implements Parser {
 						for (UnaryRule rule : possibleRules1){
 							if (rule.child.equals(output)){
 								logScore += Math.log(rule.score);
+								found = true;
 							}
 						}
+						
 					}
 					break;
 				}
@@ -296,6 +298,7 @@ class BaselineCkyParser implements Parser {
 					for (BinaryRule rule : possibleRules2){
 						if (rule.leftChild.equals(outputL) & rule.rightChild.equals(outputR)){
 							logScore += Math.log(rule.score);
+							found = true;
 						}
 					}
 					break;
@@ -303,7 +306,7 @@ class BaselineCkyParser implements Parser {
 				default:{System.err.println("logScoreHelper called for non-binary tree");}
 				}
 			}
-			return logScore;
+			return found? logScore : Double.NEGATIVE_INFINITY;
 		} else {
 			System.err.println("logScoreHelper called for leaf");
 			return 0;
