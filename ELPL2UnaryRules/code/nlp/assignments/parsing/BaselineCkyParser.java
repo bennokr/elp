@@ -33,7 +33,7 @@ class BaselineCkyParser implements Parser {
 
 		static class EdgeInfo {
 			double score; 
-			BinaryRule rule = null;
+			Rule rule = null;
 			int mid = -1;
 			EdgeInfo(double score) {
 				this.score = score;
@@ -88,7 +88,7 @@ class BaselineCkyParser implements Parser {
 			return optLabel;
 		}
 
-		void setBackPointer(int i, int j, String label, BinaryRule rule, int midPoint) {
+		void setBackPointer(int i, int j, String label, Rule rule, int midPoint) {
 			EdgeInfo edgeInfo = chart.get(i).get(j).get(label);
 			edgeInfo.rule = rule;
 			edgeInfo.mid = midPoint;
@@ -100,7 +100,7 @@ class BaselineCkyParser implements Parser {
 			return chart.get(i).get(j).get(label).mid;
 		}
 
-		BinaryRule getRule(int i, int j, String label) {
+		Rule getRule(int i, int j, String label) {
 			return chart.get(i).get(j).get(label).rule;
 		}
 
@@ -122,17 +122,17 @@ class BaselineCkyParser implements Parser {
 		// binary rules
 		if (j - i > 1) {
 
-			BinaryRule rule = chart.getRule(i, j, parent);
+			Rule rule = chart.getRule(i, j, parent);
 			int mid = chart.getMidPoint(i, j, parent);
-			List<Tree<String>> children = new ArrayList<Tree<String>>(2);
+			int nChildren = rule.getChildren().length;
+			List<Tree<String>> children = new ArrayList<Tree<String>>(nChildren);
 
-			Tree<String> t1 = new Tree<String>(rule.getLeftChild()); 
-			traverseBackPointersHelper(sent, chart, i, mid, t1);
-			children.add(t1);
-
-			Tree<String> t2 = new Tree<String>(rule.getRightChild());
-			traverseBackPointersHelper(sent, chart, mid, j, t2);
-			children.add(t2);
+			for (int c = 0; c<nChildren; c++){
+				Tree<String> t = new Tree<String>(rule.getChildren()[c]); 
+				traverseBackPointersHelper(sent, chart, i, mid, t);
+				children.set(c, t);
+			}
+			
 
 			currTree.setChildren(children);
 
@@ -190,7 +190,7 @@ class BaselineCkyParser implements Parser {
 				for (String parent : grammar.states) {
 					double bestScore = Double.NEGATIVE_INFINITY;
 					int optMid =-1;
-					BinaryRule optRule = null;
+					Rule optRule = null;
 					// parent -> c1 c2
 					for (BinaryRule rule : grammar.getBinaryRulesByParent(parent)) {
 						for (int mid = min + 1; mid <  max; mid++) {
@@ -282,8 +282,8 @@ class BaselineCkyParser implements Parser {
 					else{
 						List<UnaryRule> possibleRules1 =  grammar.getUnaryRulesByParent(inputSymbol);
 						for (UnaryRule rule : possibleRules1){
-							if (rule.child.equals(output)){
-								logScore += Math.log(rule.score);
+							if (rule.getChild().equals(output)){
+								logScore += Math.log(rule.getScore());
 								found = true;
 							}
 						}
@@ -296,8 +296,8 @@ class BaselineCkyParser implements Parser {
 					String outputR = children.get(1).getLabel();
 					List<BinaryRule> possibleRules2 =  grammar.getBinaryRulesByParent(inputSymbol);
 					for (BinaryRule rule : possibleRules2){
-						if (rule.leftChild.equals(outputL) & rule.rightChild.equals(outputR)){
-							logScore += Math.log(rule.score);
+						if (rule.getLeftChild().equals(outputL) & rule.getRightChild().equals(outputR)){
+							logScore += Math.log(rule.getScore());
 							found = true;
 						}
 					}

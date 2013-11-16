@@ -1,51 +1,42 @@
 package nlp.assignments.parsing;
 
-class UnaryRule {
-    String parent;
-    String child;
-    double score;
+public class UnaryRule extends Rule {
 
-    public String getParent() {
-      return parent;
-    }
+//	String parent;
+//	String child;
+//	double score;
 
-    public String getChild() {
-      return child;
-    }
+	public String getParent() {
+		return super.getParent();
+	}
 
-    public double getScore() {
-      return score;
-    }
+	public String getChild() {
+		return super.getChildren()[0];
+	}
 
-    public void setScore(double score) {
-      this.score = score;
-    }
+	public double getScore() {
+		return super.getScore();
+	}
 
-    public boolean equals(Object o) {
-      if (this == o) return true;
-      if (!(o instanceof UnaryRule)) return false;
+	public void setScore(double score) {
+		super.setScore(score);
+	}
 
-      final UnaryRule unaryRule = (UnaryRule) o;
+	public boolean equals(Object o) {
+		return super.equals(o);	
+				}
 
-      if (child != null ? !child.equals(unaryRule.child) : unaryRule.child != null) return false;
-      if (parent != null ? !parent.equals(unaryRule.parent) : unaryRule.parent != null) return false;
+	public int hashCode() {
+		return super.hashCode();
+	}
 
-      return true;
-    }
+	public String toString() {
+		return super.toString();
+	}
 
-    public int hashCode() {
-      int result;
-      result = (parent != null ? parent.hashCode() : 0);
-      result = 29 * result + (child != null ? child.hashCode() : 0);
-      return result;
-    }
-
-    public String toString() {
-      return parent + " -> " + child + " %% " + score;
-    }
-
-    public UnaryRule(String parent, String child) {
-      this.parent = parent;
-      this.child = child;
-    }
-  }
+	public UnaryRule(String parent, String child) {
+		super(parent,null,false);
+		String[] children = {child};
+		super.setChildren(children);
+	}
+}
