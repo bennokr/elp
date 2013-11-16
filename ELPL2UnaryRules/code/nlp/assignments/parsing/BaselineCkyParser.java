@@ -192,11 +192,13 @@ class BaselineCkyParser implements Parser {
 					int optMid =-1;
 					Rule optRule = null;
 					// parent -> c1 c2
-					for (BinaryRule rule : grammar.getBinaryRulesByParent(parent)) {
+					for (Rule rule : grammar.getBinaryRulesByParent(parent)) {
 						for (int mid = min + 1; mid <  max; mid++) {
-							double score1 = chart.get(min, mid, rule.getLeftChild());
-							double score2 = chart.get(mid, max, rule.getRightChild());
-							double currScore = score1 * score2 * rule.getScore();
+							double currScore = rule.getScore();
+							for (String child : rule.getChildren()){
+								currScore += chart.get(min, mid, child);
+							}
+								
 							if (currScore > bestScore) {
 								bestScore = currScore;
 								optMid = mid;
@@ -280,9 +282,9 @@ class BaselineCkyParser implements Parser {
 						logScore += 0;
 					}
 					else{
-						List<UnaryRule> possibleRules1 =  grammar.getUnaryRulesByParent(inputSymbol);
-						for (UnaryRule rule : possibleRules1){
-							if (rule.getChild().equals(output)){
+						List<Rule> possibleRules1 =  grammar.getUnaryRulesByParent(inputSymbol);
+						for (Rule rule : possibleRules1){
+							if (rule.getChildren()[0].equals(output)){
 								logScore += Math.log(rule.getScore());
 								found = true;
 							}
@@ -294,9 +296,9 @@ class BaselineCkyParser implements Parser {
 				case 2:{
 					String outputL = output;
 					String outputR = children.get(1).getLabel();
-					List<BinaryRule> possibleRules2 =  grammar.getBinaryRulesByParent(inputSymbol);
-					for (BinaryRule rule : possibleRules2){
-						if (rule.getLeftChild().equals(outputL) & rule.getRightChild().equals(outputR)){
+					List<Rule> possibleRules2 =  grammar.getBinaryRulesByParent(inputSymbol);
+					for (Rule rule : possibleRules2){
+						if (rule.getChildren()[0].equals(outputL) & rule.getChildren()[1].equals(outputR)){
 							logScore += Math.log(rule.getScore());
 							found = true;
 						}

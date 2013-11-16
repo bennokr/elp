@@ -16,36 +16,36 @@ import nlp.util.Counter;
    * probability estimates are just relative frequency estimates off of training trees.
    */
   class Grammar {
-    Map<String, List<BinaryRule>> binaryRulesByLeftChild = new HashMap<String, List<BinaryRule>>();
-    Map<String, List<BinaryRule>> binaryRulesByRightChild = new HashMap<String, List<BinaryRule>>();
-    Map<String, List<BinaryRule>> binaryRulesByParent = new HashMap<String, List<BinaryRule>>();
-    List<BinaryRule> binaryRules = new ArrayList<BinaryRule>();
-    Map<String, List<UnaryRule>> unaryRulesByChild = new HashMap<String, List<UnaryRule>>();
-    Map<String, List<UnaryRule>> unaryRulesByParent = new HashMap<String, List<UnaryRule>>();
+    Map<String, List<Rule>> binaryRulesByLeftChild = new HashMap<String, List<Rule>>();
+    Map<String, List<Rule>> binaryRulesByRightChild = new HashMap<String, List<Rule>>();
+    Map<String, List<Rule>> binaryRulesByParent = new HashMap<String, List<Rule>>();
+    List<Rule> binaryRules = new ArrayList<Rule>();
+    Map<String, List<Rule>> unaryRulesByChild = new HashMap<String, List<Rule>>();
+    Map<String, List<Rule>> unaryRulesByParent = new HashMap<String, List<Rule>>();
     List<UnaryRule> unaryRules = new ArrayList<UnaryRule>();
     Set<String> states = new HashSet<String>();
 
-    public List<BinaryRule> getBinaryRulesByLeftChild(String leftChild) {
+    public List<Rule> getBinaryRulesByLeftChild(String leftChild) {
       return CollectionUtils.getValueList(binaryRulesByLeftChild, leftChild);
     }
 
-    public List<BinaryRule> getBinaryRulesByRightChild(String rightChild) {
+    public List<Rule> getBinaryRulesByRightChild(String rightChild) {
       return CollectionUtils.getValueList(binaryRulesByRightChild, rightChild);
     }
 
-    public List<BinaryRule> getBinaryRulesByParent(String parent) {
+    public List<Rule> getBinaryRulesByParent(String parent) {
       return CollectionUtils.getValueList(binaryRulesByParent, parent);
     }
 
-    public List<BinaryRule> getBinaryRules() {
+    public List<Rule> getBinaryRules() {
       return binaryRules;
     }
 
-    public List<UnaryRule> getUnaryRulesByChild(String child) {
+    public List<Rule> getUnaryRulesByChild(String child) {
       return CollectionUtils.getValueList(unaryRulesByChild, child);
     }
 
-    public List<UnaryRule> getUnaryRulesByParent(String parent) {
+    public List<Rule> getUnaryRulesByParent(String parent) {
       return CollectionUtils.getValueList(unaryRulesByParent, parent);
     }
 
@@ -61,12 +61,12 @@ import nlp.util.Counter;
       StringBuilder sb = new StringBuilder();
       List<String> ruleStrings = new ArrayList<String>();
       for (String parent : binaryRulesByParent.keySet()) {
-        for (BinaryRule binaryRule : getBinaryRulesByParent(parent)) {
+        for (Rule binaryRule : getBinaryRulesByParent(parent)) {
           ruleStrings.add(binaryRule.toString());
         }
       }
       for (String parent : unaryRulesByParent.keySet()) {
-        for (UnaryRule unaryRule : getUnaryRulesByParent(parent)) {
+        for (Rule unaryRule : getUnaryRulesByParent(parent)) {
           ruleStrings.add(unaryRule.toString());
         }
       }
