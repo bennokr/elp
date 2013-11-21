@@ -28,7 +28,7 @@ class BinaryRuleOr {
 
     public boolean equals(Object o) {
       if (this == o) return true;
-      if (!(o instanceof BinaryRule)) return false;
+      if (!(o instanceof NoBinaryRule)) return false;
 
       final BinaryRuleOr binaryRule = (BinaryRuleOr) o;
 

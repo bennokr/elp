@@ -22,7 +22,7 @@ import nlp.util.Counter;
     List<Rule> binaryRules = new ArrayList<Rule>();
     Map<String, List<Rule>> unaryRulesByChild = new HashMap<String, List<Rule>>();
     Map<String, List<Rule>> unaryRulesByParent = new HashMap<String, List<Rule>>();
-    List<UnaryRule> unaryRules = new ArrayList<UnaryRule>();
+    List<Rule> unaryRules = new ArrayList<Rule>();
     Set<String> states = new HashSet<String>();
 
     public List<Rule> getBinaryRulesByLeftChild(String leftChild) {
@@ -49,7 +49,7 @@ import nlp.util.Counter;
       return CollectionUtils.getValueList(unaryRulesByParent, parent);
     }
 
-    public List<UnaryRule> getUnaryRules() {
+    public List<Rule> getUnaryRules() {
       return unaryRules;
     }
 
@@ -77,57 +77,60 @@ import nlp.util.Counter;
       return sb.toString();
     }
 
-    private void addBinary(BinaryRule binaryRule) {
-      states.add(binaryRule.getParent());
-      states.add(binaryRule.getLeftChild());
-      states.add(binaryRule.getRightChild());
-      binaryRules.add(binaryRule);
-      CollectionUtils.addToValueList(binaryRulesByParent, binaryRule.getParent(), binaryRule);
-      CollectionUtils.addToValueList(binaryRulesByLeftChild, binaryRule.getLeftChild(), binaryRule);
-      CollectionUtils.addToValueList(binaryRulesByRightChild, binaryRule.getRightChild(), binaryRule);
+    private void addRule(Rule rule){
+    	String parent = rule.getParent();
+    	String[] children = rule.getChildren();
+    	states.add(parent);
+    	for( String child : children){
+    		states.add(child);
+    	}
+    	int arity = rule.getArity();
+    	if (arity==1){
+    		unaryRules.add(rule);
+    	      CollectionUtils.addToValueList(unaryRulesByParent, parent, rule);
+    	      CollectionUtils.addToValueList(unaryRulesByChild, children[0], rule);
+    	}
+    	if (arity==2){
+    		binaryRules.add(rule);
+    	      CollectionUtils.addToValueList(binaryRulesByParent, parent, rule);
+    	      CollectionUtils.addToValueList(binaryRulesByLeftChild, children[0], rule);
+    	      CollectionUtils.addToValueList(binaryRulesByRightChild, children[1], rule);
+    	}
     }
 
-    private void addUnary(UnaryRule unaryRule) {
-      states.add(unaryRule.getParent());
-      states.add(unaryRule.getChild());
-      unaryRules.add(unaryRule);
-      CollectionUtils.addToValueList(unaryRulesByParent, unaryRule.getParent(), unaryRule);
-      CollectionUtils.addToValueList(unaryRulesByChild, unaryRule.getChild(), unaryRule);
-    }
 
     public Grammar(List<Tree<String>> trainTrees) {
-      Counter<UnaryRule> unaryRuleCounter = new Counter<UnaryRule>();
-      Counter<BinaryRule> binaryRuleCounter = new Counter<BinaryRule>();
+      Counter<Rule> unaryRuleCounter = new Counter<Rule>();
+      Counter<Rule> binaryRuleCounter = new Counter<Rule>();
       Counter<String> symbolCounter = new Counter<String>();
       for (Tree<String> trainTree : trainTrees) {
         tallyTree(trainTree, symbolCounter, unaryRuleCounter, binaryRuleCounter);
       }
-      for (UnaryRule unaryRule : unaryRuleCounter.keySet()) {
+      for (Rule unaryRule : unaryRuleCounter.keySet()) {
         double unaryProbability = unaryRuleCounter.getCount(unaryRule) / symbolCounter.getCount(unaryRule.getParent());
         unaryRule.setScore(unaryProbability);
-        addUnary(unaryRule);
+        addRule(unaryRule);
       }
-      for (BinaryRule binaryRule : binaryRuleCounter.keySet()) {
+      for (Rule binaryRule : binaryRuleCounter.keySet()) {
         double binaryProbability = binaryRuleCounter.getCount(binaryRule) / symbolCounter.getCount(binaryRule.getParent());
         binaryRule.setScore(binaryProbability);
-        addBinary(binaryRule);
+        addRule(binaryRule);
       }
     }
 
-    private void tallyTree(Tree<String> tree, Counter<String> symbolCounter, Counter<UnaryRule> unaryRuleCounter, Counter<BinaryRule> binaryRuleCounter) {
+    private void tallyTree(Tree<String> tree, Counter<String> symbolCounter, Counter<Rule> unaryRuleCounter, Counter<Rule> binaryRuleCounter) {
       if (tree.isLeaf()) return;
       if (tree.isPreTerminal()) return;
-      if (tree.getChildren().size() == 1) {
-        UnaryRule unaryRule = makeUnaryRule(tree);
-        symbolCounter.incrementCount(tree.getLabel(), 1.0);
-        unaryRuleCounter.incrementCount(unaryRule, 1.0);
+      int arity = tree.getChildren().size();
+      Rule rule = makeRule(tree);
+      symbolCounter.incrementCount(tree.getLabel(), 1.0);
+      if(arity == 1){
+    	  unaryRuleCounter.incrementCount(rule, 1.0);
       }
-      if (tree.getChildren().size() == 2) {
-        BinaryRule binaryRule = makeBinaryRule(tree);
-        symbolCounter.incrementCount(tree.getLabel(), 1.0);
-        binaryRuleCounter.incrementCount(binaryRule, 1.0);
+      if(arity == 2){
+    	  binaryRuleCounter.incrementCount(rule, 1.0);
       }
-      if (tree.getChildren().size() < 1 || tree.getChildren().size() > 2) {
+      if (arity < 1 || arity > 2) {
         throw new RuntimeException("Attempted to construct a Grammar with an illegal tree (unbinarized?): " + tree);
       }
       for (Tree<String> child : tree.getChildren()) {
@@ -135,11 +138,13 @@ import nlp.util.Counter;
       }
     }
 
-    private UnaryRule makeUnaryRule(Tree<String> tree) {
-      return new UnaryRule(tree.getLabel(), tree.getChildren().get(0).getLabel());
+    private Rule makeRule(Tree<String> tree){
+    	List<Tree<String>> kids = tree.getChildren();
+    	String[] children = new String[kids.size()];
+    	for (int i = 0; i<kids.size(); i++){
+    		children[i] = kids.get(i).getLabel();
+    	}
+    	return new Rule(tree.getLabel(),children,true);
     }
-
-    private BinaryRule makeBinaryRule(Tree<String> tree) {
-      return new BinaryRule(tree.getLabel(), tree.getChildren().get(0).getLabel(), tree.getChildren().get(1).getLabel());
-    }
+  
   }

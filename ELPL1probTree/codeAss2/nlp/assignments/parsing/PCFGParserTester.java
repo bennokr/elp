@@ -28,7 +28,7 @@ public class PCFGParserTester {
     //int maxTrainLength = 1000;   // this is the standard setting (e.g., to compare with the previous work) 
     int maxTrainLength = 20;  // use if for time/memory constraints cannot use the default setting  
     //int maxTestLength = 40; // this is the standard setting (e.g., to compare with the previous work) 
-    int maxTestLength = 20;  // use if for time/memory constraints cannot use the default settingint
+    int maxTestLength = 20;  // use if for time/memory constraints cannot use the default setting
     // Please keep the above values (20 / 20) in the versions you submit
     
 

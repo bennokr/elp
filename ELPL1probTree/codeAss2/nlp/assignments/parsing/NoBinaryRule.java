@@ -1,13 +1,13 @@
 package nlp.assignments.parsing;
 
-public class BinaryRule extends Rule {
+public class NoBinaryRule extends Rule {
 
-	public BinaryRule(String parent, String[] children, boolean annotated) {
+	public NoBinaryRule(String parent, String[] children, boolean annotated) {
 		super(parent, children, annotated);
 		// TODO Auto-generated constructor stub
 	}
 	
-	  public BinaryRule(String parent, String leftChild, String rightChild) {
+	  public NoBinaryRule(String parent, String leftChild, String rightChild) {
 		  super(parent, new String[0],false);
 		  String[] children = {leftChild,rightChild};
 	      super.setChildren(children);

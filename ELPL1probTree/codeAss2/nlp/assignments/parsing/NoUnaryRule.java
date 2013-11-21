@@ -1,6 +1,6 @@
 package nlp.assignments.parsing;
 
-public class UnaryRule extends Rule {
+public class NoUnaryRule extends Rule {
 
 //	String parent;
 //	String child;
@@ -34,7 +34,7 @@ public class UnaryRule extends Rule {
 		return super.toString();
 	}
 
-	public UnaryRule(String parent, String child) {
+	public NoUnaryRule(String parent, String child) {
 		super(parent,new String[0],false);
 		String[] children = {child};
 		super.setChildren(children);

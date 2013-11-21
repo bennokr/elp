@@ -124,7 +124,7 @@ class BaselineCkyParser implements Parser {
 
 			Rule rule = chart.getRule(i, j, parent);
 			int mid = chart.getMidPoint(i, j, parent);
-			int nChildren = rule.getChildren().length;
+			int nChildren = rule.getChildren().length; //should be 2
 			List<Tree<String>> children = new ArrayList<Tree<String>>(nChildren);
 
 			for (int c = 0; c<nChildren; c++){
