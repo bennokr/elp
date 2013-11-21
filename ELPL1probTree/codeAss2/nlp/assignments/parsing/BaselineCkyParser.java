@@ -132,7 +132,7 @@ class BaselineCkyParser implements Parser {
 				traverseBackPointersHelper(sent, chart, i, mid, t);
 				children.set(c, t);
 			}
-			
+
 
 			currTree.setChildren(children);
 
@@ -198,7 +198,7 @@ class BaselineCkyParser implements Parser {
 							for (String child : rule.getChildren()){
 								currScore += chart.get(min, mid, child);
 							}
-								
+
 							if (currScore > bestScore) {
 								bestScore = currScore;
 								optMid = mid;
@@ -259,59 +259,56 @@ class BaselineCkyParser implements Parser {
 
 	private double logScoreHelper(Tree<String> tree) {
 		List<Tree<String>> children = tree.getChildren();
-		if (children.size()>0){
-			double logScore = 0;
-			String output = children.get(0).getLabel();
-			boolean found = false;
-			if (tree.isPreTerminal()){
-				double score = lexicon.scoreTagging(output, tree.getLabel());
-				if (!Double.isNaN(score)){
-					logScore += Math.log(score);
-					found = true;
-				}
-			}
-			else{ //add the scores of the children 
-				for (Tree<String> child : children){
-					logScore += logScoreHelper(child);
-				}
-				// and the score of this node
-				String inputSymbol = tree.getLabel();
-				switch(children.size()){
-				case 1:{
-					if (inputSymbol.equals(output)) { //reflexivity, prob = 1 so logprob is 0
-						logScore += 0;
-					}
-					else{
-						List<Rule> possibleRules1 =  grammar.getUnaryRulesByParent(inputSymbol);
-						for (Rule rule : possibleRules1){
-							if (rule.getChildren()[0].equals(output)){
-								logScore += Math.log(rule.getScore());
-								found = true;
-							}
-						}
-						
-					}
-					break;
-				}
-				case 2:{
-					String outputL = output;
-					String outputR = children.get(1).getLabel();
-					List<Rule> possibleRules2 =  grammar.getBinaryRulesByParent(inputSymbol);
-					for (Rule rule : possibleRules2){
-						if (rule.getChildren()[0].equals(outputL) & rule.getChildren()[1].equals(outputR)){
-							logScore += Math.log(rule.getScore());
-							found = true;
-						}
-					}
-					break;
-				}
-				default:{System.err.println("logScoreHelper called for non-binary tree");}
-				}
-			}
-			return found? logScore : Double.NEGATIVE_INFINITY;
-		} else {
-			System.err.println("logScoreHelper called for leaf");
-			return 0;
+		int arity = children.size();
+		String inputSymbol = tree.getLabel();
+		String[] outputs = new String[arity];
+		for (int i = 0; i<arity; i++){
+			outputs[i]=children.get(i).getLabel();
 		}
+		double logScore = 0;
+		boolean found = false;
+
+		if(tree.isPreTerminal()){
+			double score = lexicon.scoreTagging(outputs[0], tree.getLabel());
+			if (!Double.isNaN(score)){
+				logScore += Math.log(score);
+				found = true;
+			}
+		}
+		else{
+			//add the scores of the children 
+			for (Tree<String> child : children){
+				logScore += logScoreHelper(child);
+			}
+			// and compute the score of this node:
+			List<Rule> possibleRules;
+			switch(arity){
+			case 1:{
+				possibleRules = grammar.getUnaryRulesByParent(inputSymbol); break;
+			}
+			case 2:{
+				possibleRules = grammar.getBinaryRulesByParent(inputSymbol); break;
+			}
+			default:{
+				System.err.println("logScoreHelper called for non-binary tree");
+				possibleRules = grammar.getBinaryRulesByParent(inputSymbol);
+			}
+			}
+			for (Rule rule : possibleRules){
+				//check if the rule matches:
+				found = true;
+				for (int i = 0; i<arity; i++){
+					if (!rule.getChildren()[i].equals(outputs[i])){
+						found = false;
+					}
+				}
+				//if it does: add the score
+				if (found){
+					logScore += Math.log(rule.getScore());
+					break; //and stop searching for the rule
+				}
+			}
+		}
+		return found? logScore : Double.NEGATIVE_INFINITY;
 	}
 }
