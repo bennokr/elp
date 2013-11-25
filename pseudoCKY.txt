@@ -1,0 +1,89 @@
+Binary case:
+for each max from 2 to n
+   for each min from max-2 down to 0
+      for each syntactic category C
+         for each binary rule C -> C1 C2
+            for each mid from min+1 to max-1
+               if (chart[min][mid][C1] && char[mid][max][C2])
+                  chart[min][max][C] = true
+
+
+
+Binary probabilistic case:
+for each max from 2 to n
+   for each min from max-2 down to 0
+      for each syntactic category C
+         double best;
+         for each binary rule C -> C1 C2
+            for each mid from min+1 to max-1
+            double t1 = chart[min][mid][C1];
+            double t2 = chart[mid][max][C2];
+            double candidate = t1*t2 * score(rule);
+            if candidate > best
+               best = candidate
+         chart[min][max][C] = best
+
+
+
+Unary probabilistic case:
+for each max from 1 to n
+   for each min from max-1 down to 0
+   //First, try all binary rules as before
+   // NB: alleen zinnig als er een mid bestaat
+   if(max-min >1){
+      for each syntactic category C
+         double best;
+         for each binary rule C -> C1 C2
+            for each mid from min+1 to max-1
+            double t1 = chart[min][mid][C1];
+            double t2 = chart[mid][max][C2];
+            double candidate = t1*t2 * score(rule);
+            if candidate > best
+               best = candidate
+         chart[min][max][C] = best
+           // and set backpointer!
+   }
+
+
+
+   // Then, try all unary rules
+   for each syntactic category C
+      double best;
+      for each unary rule c-> C1   // in the unary closure!
+      double candidate = chart[min][max][C1]*score(rule)
+      if candidate > best
+         best = candidate
+      chart[min][max][C] = best
+      // and set backpointer!
+
+Unary case:
+for each max from 1 to n
+   for each min from max-1 down to 0
+   //First, try all binary rules as before
+
+   // Then, try all unary rules
+   for each syntactic category C
+      for each unary rule c-> C1
+      if (chart[min][max][c1]{
+         chart[min][max][C] = true
+         }
+
+         
+NB add reflexive transitive closure
+
+int n; //number of words in the sequence
+int m; //number of syntactic categories in the grammar
+int s; //the number of the grammar's start symbol
+
+boolean[][][] chart = new boolean[n+1][n+1][m]
+//Recognize all parse trees built with preterminal rules
+//Recognize all parse trees built with inner rules
+return chart[o][n][S];
+
+
+
+Probabilistic version:
+Chart is a doubke array
+chart[min][max][C] // the probability of the most probable subtree with a given signature
+chart[0][n][S]
+

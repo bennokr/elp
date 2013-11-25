@@ -111,8 +111,38 @@ class BaselineCkyParser implements Parser {
 
 	}
 
+	private List<Tree<String>> traverseBackPointersHelper2(List<String> sentence,
+			Chart chart, int i, int j, String parent) {
+		int mid = chart.getMidPoint(i, j, parent);
+
+		Rule rule = chart.getRule(i, j, parent);
+		String[] children = rule.getChildren();
+		int nChildren = rule.getArity();
+
+		List<Tree<String>> toReturn = new ArrayList<Tree<String>>(nChildren);
+
+		boolean second = false;
+		for (String child : children){
+			Tree<String> baby = new Tree<String>(child);
+			baby.setChildren(second?
+					traverseBackPointersHelper2(sentence,chart,i,mid, child):
+					traverseBackPointersHelper2(sentence,chart,mid,j, child));
+			if(nChildren ==2){
+				second = true;
+			}
+			toReturn.add(baby);
+		}
+
+
+
+		return toReturn;
+	}
+
+
 	void traverseBackPointersHelper(List<String> sent, Chart chart, int i, int j, Tree<String> currTree) {
 		String parent = currTree.getLabel();
+
+
 
 		/** 
 		 * TODO 
@@ -162,6 +192,14 @@ class BaselineCkyParser implements Parser {
 
 	}
 
+	Tree<String> traverseBackPointers2(List<String> sentence, Chart chart) {
+		Tree<String> annotatedBestParse = new Tree<String>("ROOT");
+		annotatedBestParse.setChildren(traverseBackPointersHelper2(sentence, chart, 0, sentence.size(), "ROOT"));
+
+		return annotatedBestParse;
+	}
+
+
 
 	public Tree<String> getBestParse(List<String> sentence) {
 
@@ -183,38 +221,63 @@ class BaselineCkyParser implements Parser {
 			}
 		}
 
-		// CKY for binary trees
-		for (int max = 2; max <= sentence.size(); max++) {
-			for (int min = max - 2; min >= 0; min--) {
-				// first without unary roles
-				for (String parent : grammar.states) {
-					double bestScore = Double.NEGATIVE_INFINITY;
-					int optMid =-1;
-					Rule optRule = null;
-					
-					// parent -> c1 c2
-					for (Rule rule : grammar.getBinaryRulesByParent(parent)) {
-						for (int mid = min + 1; mid <  max; mid++) {
-							double currScore = rule.getScore();
-							for (String child : rule.getChildren()){
-								currScore += chart.get(min, mid, child);
-							}
 
-							if (currScore > bestScore) {
-								bestScore = currScore;
-								optMid = mid;
-								optRule = rule;;
+		for(int max = 1; max<=sentence.size(); max++){
+			for(int min = max-1; min>=0; min--){
+				if(max-min>1){
+					// Try binary rules:
+					for (String parent: grammar.states){
+						double bestScore = Double.NEGATIVE_INFINITY;
+						int optMid =-1;
+						Rule optRule = null;
+
+						// parent -> c1 c2
+						for (Rule rule : grammar.getBinaryRulesByParent(parent)) {
+							for (int mid = min + 1; mid <  max; mid++) {
+								double currScore = rule.getScore();
+								currScore += chart.get(min, mid, rule.getChildren()[0]);
+								currScore += chart.get(mid, max, rule.getChildren()[1]);
+								if (currScore > bestScore) {
+									bestScore = currScore;
+									optMid = mid;
+									optRule = rule;;
+								}
 							}
 						}
-					}
-					if (bestScore != Double.NEGATIVE_INFINITY) { 
-						chart.set(min, max, parent, bestScore);
-						chart.setBackPointer(min, max, parent, optRule, optMid);
+						if (bestScore != Double.NEGATIVE_INFINITY) { 
+							chart.set(min, max, parent, bestScore);
+							chart.setBackPointer(min, max, parent, optRule, optMid);
+						}
 					}
 				}
+				// Try unary rules:
+				for (String parent: grammar.states){
+					double bestScore = Double.NEGATIVE_INFINITY;
+					Rule optRule = null;
+					// parent -> c1
+					for (Rule rule: grammar.getUnaryRulesByParent(parent)){
+						//NB: reflexive transitive closure!
+						double currScore = rule.getScore();
+						for (String child : rule.getChildren()){
+							currScore += chart.get(min, max, child);
+						}
+						if (currScore > bestScore) {
+							bestScore = currScore;
+							optRule = rule;;
+						}
 
+					}
+
+					if (bestScore != Double.NEGATIVE_INFINITY) { 
+						chart.set(min, max, parent, bestScore);
+						chart.setBackPointer(min, max, parent, optRule, max); //mid = max, convenient for traverseBackPointers
+
+					}
+				}
 			}
 		}
+
+
 
 		// use back pointers to create a tree
 		Tree<String> annotatedBestParse = traverseBackPointers(sentence, chart);
