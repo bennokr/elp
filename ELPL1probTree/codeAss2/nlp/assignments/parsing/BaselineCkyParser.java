@@ -191,6 +191,7 @@ class BaselineCkyParser implements Parser {
 					double bestScore = Double.NEGATIVE_INFINITY;
 					int optMid =-1;
 					Rule optRule = null;
+					
 					// parent -> c1 c2
 					for (Rule rule : grammar.getBinaryRulesByParent(parent)) {
 						for (int mid = min + 1; mid <  max; mid++) {
