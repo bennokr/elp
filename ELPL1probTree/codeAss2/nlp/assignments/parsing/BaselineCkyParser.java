@@ -23,7 +23,7 @@ class BaselineCkyParser implements Parser {
 	Lexicon lexicon;
 	Grammar grammar;
 
-	//UnaryClosure unaryClosure;
+//	UnaryClosure unaryClosure;
 
 	static class Chart {
 		/*
@@ -298,7 +298,7 @@ class BaselineCkyParser implements Parser {
 		System.out.println("done.");
 
 		System.out.print("Building grammar ... ");
-		grammar = new Grammar(annotatedTrainTrees);
+		grammar = new UnaryClosedGrammar(annotatedTrainTrees);
 		lexicon = new Lexicon(annotatedTrainTrees);
 		System.out.println("done. (" + grammar.getStates().size() + " states)");
 

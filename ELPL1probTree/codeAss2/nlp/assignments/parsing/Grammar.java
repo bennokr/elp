@@ -24,6 +24,10 @@ import nlp.util.Counter;
     Map<String, List<Rule>> unaryRulesByParent = new HashMap<String, List<Rule>>();
     List<Rule> unaryRules = new ArrayList<Rule>();
     Set<String> states = new HashSet<String>();
+    
+    
+    
+   
 
     public List<Rule> getBinaryRulesByLeftChild(String leftChild) {
       return CollectionUtils.getValueList(binaryRulesByLeftChild, leftChild);
@@ -42,10 +46,13 @@ import nlp.util.Counter;
     }
 
     public List<Rule> getUnaryRulesByChild(String child) {
-      return CollectionUtils.getValueList(unaryRulesByChild, child);
+    
+     return CollectionUtils.getValueList(unaryRulesByChild, child);
     }
 
     public List<Rule> getUnaryRulesByParent(String parent) {
+    	
+    	
       return CollectionUtils.getValueList(unaryRulesByParent, parent);
     }
 
@@ -98,6 +105,8 @@ import nlp.util.Counter;
     	}
     }
 
+   // public Grammar(Grammar grammar){
+  //    }
 
     public Grammar(List<Tree<String>> trainTrees) {
       Counter<Rule> unaryRuleCounter = new Counter<Rule>();
@@ -116,6 +125,7 @@ import nlp.util.Counter;
         binaryRule.setScore(binaryProbability);
         addRule(binaryRule);
       }
+      
     }
 
     private void tallyTree(Tree<String> tree, Counter<String> symbolCounter, Counter<Rule> unaryRuleCounter, Counter<Rule> binaryRuleCounter) {
