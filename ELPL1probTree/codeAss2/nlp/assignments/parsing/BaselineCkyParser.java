@@ -23,7 +23,7 @@ class BaselineCkyParser implements Parser {
 	Lexicon lexicon;
 	Grammar grammar;
 
-//	UnaryClosure unaryClosure;
+	//	UnaryClosure unaryClosure;
 
 	static class Chart {
 		/*
@@ -126,7 +126,7 @@ class BaselineCkyParser implements Parser {
 			Tree<String> baby = new Tree<String>(child);
 			baby.setChildren(second?
 					traverseBackPointersHelper2(sentence,chart,i,mid, child):
-					traverseBackPointersHelper2(sentence,chart,mid,j, child));
+						traverseBackPointersHelper2(sentence,chart,mid,j, child));
 			if(nChildren ==2){
 				second = true;
 			}
@@ -193,9 +193,23 @@ class BaselineCkyParser implements Parser {
 	}
 
 	Tree<String> traverseBackPointers2(List<String> sentence, Chart chart) {
-		Tree<String> annotatedBestParse = new Tree<String>("ROOT");
+		Tree<String> annotatedBestParse = new Tree<String>("ROOT");;
+	for (String label : chart.getAllCandidateLabels(0, sentence.size())){
+		System.out.println("possible label is: "+label);
+	}
+		/*
+		if (!chart.getAllCandidateLabels(0, sentence.size()).contains("ROOT")) {
+			// this line is here only to make sure that a baseline without binary rules can output something 
+			annotatedBestParse = new Tree<String>(chart.getBestLabel(0, sentence.size()));
+		} else {
+			// in reality we always want to start with the ROOT symbol of the grammar
+			annotatedBestParse = new Tree<String>("ROOT");
+		}
+		
+		
+	//	Tree<String> annotatedBestParse = new Tree<String>("ROOT");
 		annotatedBestParse.setChildren(traverseBackPointersHelper2(sentence, chart, 0, sentence.size(), "ROOT"));
-
+*/
 		return annotatedBestParse;
 	}
 
@@ -263,13 +277,14 @@ class BaselineCkyParser implements Parser {
 						}
 						if (currScore > bestScore) {
 							bestScore = currScore;
-							optRule = rule;;
+							optRule = rule;
 						}
 
 					}
 
 					if (bestScore != Double.NEGATIVE_INFINITY) { 
 						chart.set(min, max, parent, bestScore);
+						
 						chart.setBackPointer(min, max, parent, optRule, max); //mid = max, convenient for traverseBackPointers
 
 					}
@@ -280,7 +295,7 @@ class BaselineCkyParser implements Parser {
 
 
 		// use back pointers to create a tree
-		Tree<String> annotatedBestParse = traverseBackPointers(sentence, chart);
+		Tree<String> annotatedBestParse = traverseBackPointers2(sentence, chart);
 
 		return annotator.unAnnotateTree(annotatedBestParse);
 	}
