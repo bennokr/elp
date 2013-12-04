@@ -71,7 +71,7 @@ class BaselineCkyParser implements Parser {
 			}
 		}
 
-		/*void set(int i, int j, String label, double score, Rule rule, int midPoint){
+		void set(int i, int j, String label, double score, Rule rule, int midPoint){
 			chart.get(i).get(j).put(label, new EdgeInfo(score, rule, midPoint));
 		}
 		
@@ -81,7 +81,7 @@ class BaselineCkyParser implements Parser {
 		
 		void set(int i, int j, String label, double score, Rule rule){
 			chart.get(i).get(j).put(label, new EdgeInfo(score, rule));		
-		}*/
+		}
 		
 		double get(int i, int j, String label) {
 			Map<String,EdgeInfo> edgeScores = chart.get(i).get(j);
@@ -130,8 +130,15 @@ class BaselineCkyParser implements Parser {
 			}
 			case UNARY: {
 				String childLabel = edge.rule.getChildren()[0];
-				List<Tree<String>> child = Collections.singletonList(traverseBackPointersHelper(sentence, chart, i, j, childLabel));
-				return new Tree<String>(parent, child);
+				List<Tree<String>> children;
+				if (childLabel .equals(parent)){
+					System.err.print("HELP, my child is named"+childLabel);
+					children = new ArrayList<Tree<String>>();
+				}
+				else{
+					children = Collections.singletonList(traverseBackPointersHelper(sentence, chart, i, j, childLabel));
+				}
+				return new Tree<String>(parent, children);
 			}
 			case BINARY: {
 				String[] childLabels = edge.rule.getChildren();
@@ -149,24 +156,9 @@ class BaselineCkyParser implements Parser {
 	}
 
 	Tree<String> traverseBackPointers(List<String> sentence, Chart chart) {
-		Tree<String> annotatedBestParse = new Tree<String>("ROOT");
-	for (String label : chart.getAllCandidateLabels(0, sentence.size())){
-		System.out.println("possible label is: "+label);
-	}
-		/*
-		if (!chart.getAllCandidateLabels(0, sentence.size()).contains("ROOT")) {
-			// this line is here only to make sure that a baseline without binary rules can output something 
-			annotatedBestParse = new Tree<String>(chart.getBestLabel(0, sentence.size()));
-		} else {
-			// in reality we always want to start with the ROOT symbol of the grammar
-			annotatedBestParse = new Tree<String>("ROOT");
-		}
-		
-		
-	//	Tree<String> annotatedBestParse = new Tree<String>("ROOT");
-		annotatedBestParse.setChildren(traverseBackPointersHelper2(sentence, chart, 0, sentence.size(), "ROOT"));
-*/
-		return annotatedBestParse;
+
+		return traverseBackPointersHelper(sentence, chart, 0, sentence.size(), "ROOT");
+
 	}
 
 
@@ -220,10 +212,14 @@ class BaselineCkyParser implements Parser {
 				}
 				// Try unary rules:
 				for (String parent: grammar.states){
+					
 					double bestScore = Double.NEGATIVE_INFINITY;
 					Rule optRule = null;
 					// parent -> c1
 					for (Rule rule: grammar.getUnaryRulesByParent(parent)){
+						if (rule.getChildren()[0].equals(parent)){
+							break;
+						}
 						//NB: reflexive transitive closure!
 						double currScore = Math.log(rule.getScore());
 						for (String child : rule.getChildren()){
