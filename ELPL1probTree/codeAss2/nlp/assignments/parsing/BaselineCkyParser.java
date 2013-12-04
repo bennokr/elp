@@ -82,7 +82,7 @@ class BaselineCkyParser implements Parser {
 			}
 		}
 
-		void set(int i, int j, String label, double score, Rule rule, int midPoint){
+		/*void set(int i, int j, String label, double score, Rule rule, int midPoint){
 			chart.get(i).get(j).put(label, new EdgeInfo(score, rule, midPoint));
 		}
 		
@@ -93,7 +93,7 @@ class BaselineCkyParser implements Parser {
 		
 		void set(int i, int j, String label, double score, Rule rule){
 			chart.get(i).get(j).put(label, new EdgeInfo(score, rule));		
-		}
+		}*/
 		
 	/*	
 		void set(int i, int j, String label, double score) {

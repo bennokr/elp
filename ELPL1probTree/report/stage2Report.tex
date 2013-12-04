@@ -13,17 +13,51 @@ Stage 2: Adding support of Unary Rules in the CKY ALgorithm}
 \maketitle
 
 The CKY algorithm was originally implemented for binary rules only. We extended the code to support unary rules.
-\paragraph{Implementation}
-We created a general class {\tt Rule} to replace the {\tt BinaryRule} and {\tt UnaryRule} classes. Occurrences of {\tt Rule} can be either binary or unary rules. The method {\tt getChildren()} returns an array of Strings. This enables other functions to iterate over the children in a more general way.
+\section{Implementation}
+\paragraph{Grammar}
+\begin{itemize}
+\item We created a general class {\tt Rule} to replace the {\tt BinaryRule} and {\tt UnaryRule} classes. Occurrences of {\tt Rule} can be either binary or unary rules. The method {\tt getChildren()} returns an array of Strings. This enables other functions to iterate over the children in a more general way.
 
-The Parsing algorithm itself is run with the function {\tt getBestParse(sentence)}. The pseudocode of the algorithm is as follows:
+\item We extended the class {\tt Grammar} with {\tt UnaryClosedGrammar}, which is a grammar that computes and stores the unary closure of all unary rules after instantiation. The methods {\tt getUnaryRulesByParent(String)} and {\tt getUnaryRulesByChild} are guaranteed to return the unary closure of unary rules.
 
+\end{itemize}
+
+\paragraph{Parsing}
+\begin{itemize}
+\item 
+The Parsing algorithm itself is run with the function {\tt getBestParse(List<String>)}. The pseudocode of the algorithm is as follows:
 \begin{program}
-\mbox{Match preterminal rules}
+\mbox{match preterminal productions}
+
+\FOR max=1 : 1 :  n
+      \FOR min = max-1 : -1 : 0
+              \FOREACH C \in syntacticCategories
+\FOREACH R \in binary rules
+\FOR mid = min+1 : 1: max-1
+	          \mbox{match binary rule, keep the best scoring rule and its midpoint}
+\END
+\END
+              \mbox{store the best rule and midpoint in the chart}
+\END
+ \FOREACH C \in syntacticCategories
+\FOREACH R \in unary closure
+ \mbox{match unary rule, keep the best scoring rule}
+\END
+\IF (bestScoringUnary > bestStoredInChart)
+\mbox{replace this position in the chart with the unary rule}
+           
+\END
+\END
+\END
+\END
 
 \end{program}
+\item After performing the CKY parsing, the tree is recovered by traversing the backpointers in the chart. 
+We altered the classes {\tt Chart} and {\tt EdgeInfo} such that an {\tt EdgeInfo} object has a certain {\tt type}: preterminal, unary, or binary. When the {\tt set} function of {\tt Chart} is called with 3, 4, or 5 parameters, the appropriate constructor for {\tt EdgeInfo} is called. The parameters always include the {\tt i} and {\tt j}, the end points of the edge, and {\tt label} its label. The optional arguments are a {\tt Rule} object and a {\tt midpoint}
 
+We rewrote the methods {\tt traverseBackPointers} and {\tt traverseBackPointersHelper}. 
+\end{itemize}
 
-\paragraph{Results}
+\section{Results}
 
 \end{document}
