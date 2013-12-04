@@ -27,7 +27,7 @@ class BaselineCkyParser implements Parser {
 
 	//	UnaryClosure unaryClosure;
 
-	static class Chart {
+	static public class Chart {
 		static class EdgeInfo {
 
 			enum type{PRETERMINAL, UNARY, BINARY};
@@ -116,9 +116,6 @@ class BaselineCkyParser implements Parser {
 			}
 		}
 
-		EdgeInfo.type getType(int i, int j, String label){
-			return chart.get(i).get(j).get(label).type;
-		}
 		
 		Set<String> getAllCandidateLabels(int i, int j) {
 			return chart.get(i).get(j).keySet();
@@ -137,16 +134,9 @@ class BaselineCkyParser implements Parser {
 			return optLabel;
 		}
 
-
-
-
-
-		int getMidPoint(int i, int j, String label) {
-			return chart.get(i).get(j).get(label).mid;
-		}
-
-		Rule getRule(int i, int j, String label) {
-			return chart.get(i).get(j).get(label).rule;
+		
+		EdgeInfo getinfo(int i, int j, String label){
+			return chart.get(i).get(j).get(label);
 		}
 
 		@Override
@@ -155,7 +145,6 @@ class BaselineCkyParser implements Parser {
 		}
 
 	}
-
 
 	private List<Tree<String>> traverseBackPointersHelper2(List<String> sentence,
 			Chart chart, int i, int j, String parent) {

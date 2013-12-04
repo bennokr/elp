@@ -1,0 +1,29 @@
+\documentclass{article}
+\usepackage[margin=1cm,a4paper]{geometry}
+\usepackage{tikz}
+%\usetikzlibrary{trees}
+\usepackage{program}
+
+\title{Elements of Language Processing and Learning\\
+Lab assignment report\\
+Stage 2: Adding support of Unary Rules in the CKY ALgorithm}
+\author{Benno Kruit, 10576223\\Sara Veldhoen, 10545298}
+
+\begin{document}
+\maketitle
+
+The CKY algorithm was originally implemented for binary rules only. We extended the code to support unary rules.
+\paragraph{Implementation}
+We created a general class {\tt Rule} to replace the {\tt BinaryRule} and {\tt UnaryRule} classes. Occurrences of {\tt Rule} can be either binary or unary rules. The method {\tt getChildren()} returns an array of Strings. This enables other functions to iterate over the children in a more general way.
+
+The Parsing algorithm itself is run with the function {\tt getBestParse(sentence)}. The pseudocode of the algorithm is as follows:
+
+\begin{program}
+\mbox{Match preterminal rules}
+
+\end{program}
+
+
+\paragraph{Results}
+
+\end{document}

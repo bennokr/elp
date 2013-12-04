@@ -3,7 +3,7 @@ package nlp.assignments.parsing;
 public class Rule {
 
 	private String parent;
-	private int arity;
+	//private int arity;
 	private String[] children;
 	private double score;
 	private boolean isAnnotated;
@@ -17,7 +17,7 @@ public class Rule {
 	}
 
 	public int getArity(){
-		return arity;	    	
+		return children.length;	    	
 	}
 
 	public double getScore() {
@@ -68,16 +68,16 @@ public class Rule {
 	}
 
 	public Rule(String parent, String[] children, boolean annotated) {
-		this.arity = children.length;
+		//this.arity = children.length;
 		this.parent = parent;
 		this.children = children;
-		this.arity = children.length;
+		//this.arity = children.length;
 		this.isAnnotated = annotated;
 	}
 
 	public void setChildren(String[] children) {
 		this.children = children;
-		this.arity = children.length;
+	//	this.arity = children.length;
 	}
 
 
