@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import nlp.assignments.parsing.Chart.EdgeInfo;
+import nlp.assignments.parsing.Chart.EdgeInfo.type;
 import nlp.ling.Tree;
 import nlp.util.CounterMap;
 
@@ -25,19 +27,35 @@ class BaselineCkyParser implements Parser {
 
 	//	UnaryClosure unaryClosure;
 
-	static class Chart {
-		/*
-		 * TODO
-		 *  This class (and enclosed EdgeInfo) needs to be changed to keep track of unary rules (and unary chains) used
-		 */
-
+	public class Chart {
 		static class EdgeInfo {
+
+			enum type{PRETERMINAL, UNARY, BINARY};
+		
+			type type;
 			double score; 
 			Rule rule = null;
 			int mid = -1;
+			
 			EdgeInfo(double score) {
 				this.score = score;
+				this.type = type.PRETERMINAL;
 			}
+			
+			EdgeInfo(double score, Rule rule){
+				this(score);
+				this.rule = rule;
+				this.type = type.UNARY;
+			}
+			
+			EdgeInfo(double score, Rule rule, int mid){
+				this(score, rule);
+				this.mid = mid;
+				this.type = type.BINARY;
+			}
+			
+			
+			
 			@Override
 			public String toString() {
 				if (rule == null) {
@@ -47,9 +65,14 @@ class BaselineCkyParser implements Parser {
 				}
 
 			}
-		}
+		
+		
+	}
 
-		Map<Integer,Map<Integer,Map<String, EdgeInfo>>> chart = new HashMap<Integer, Map<Integer,Map<String,EdgeInfo>>>();
+
+		
+		Map<Integer,Map<Integer,Map<String, EdgeInfo>>> chart = 
+				new HashMap<Integer, Map<Integer,Map<String,EdgeInfo>>>();
 		Chart(int seqLength) {
 			for (int i = 0; i < seqLength; i++) {
 				chart.put(i, new HashMap<Integer, Map<String,EdgeInfo>>());
@@ -59,9 +82,31 @@ class BaselineCkyParser implements Parser {
 			}
 		}
 
+		void set(int i, int j, String label, double score, Rule rule, int midPoint){
+			chart.get(i).get(j).put(label, new EdgeInfo(score, rule, midPoint));
+		}
+		
+		void set(int i, int j, String label, double score){
+			chart.get(i).get(j).put(label, new EdgeInfo(score));
+			
+		}
+		
+		void set(int i, int j, String label, double score, Rule rule){
+			chart.get(i).get(j).put(label, new EdgeInfo(score, rule));		
+		}
+		
+	/*	
 		void set(int i, int j, String label, double score) {
 			chart.get(i).get(j).put(label, new EdgeInfo(score));
 		}
+		
+		void setBackPointer(int i, int j, String label, Rule rule, int midPoint) {
+			EdgeInfo edgeInfo = chart.get(i).get(j).get(label);
+			edgeInfo.rule = rule;
+			edgeInfo.mid = midPoint;
+		}
+	*/	
+		
 		double get(int i, int j, String label) {
 			Map<String,EdgeInfo> edgeScores = chart.get(i).get(j);
 			if (!edgeScores.containsKey(label)) {
@@ -71,6 +116,10 @@ class BaselineCkyParser implements Parser {
 			}
 		}
 
+		EdgeInfo.type getType(int i, int j, String label){
+			return chart.get(i).get(j).get(label).type;
+		}
+		
 		Set<String> getAllCandidateLabels(int i, int j) {
 			return chart.get(i).get(j).keySet();
 		}
@@ -88,11 +137,7 @@ class BaselineCkyParser implements Parser {
 			return optLabel;
 		}
 
-		void setBackPointer(int i, int j, String label, Rule rule, int midPoint) {
-			EdgeInfo edgeInfo = chart.get(i).get(j).get(label);
-			edgeInfo.rule = rule;
-			edgeInfo.mid = midPoint;
-		}
+
 
 
 
@@ -110,6 +155,7 @@ class BaselineCkyParser implements Parser {
 		}
 
 	}
+
 
 	private List<Tree<String>> traverseBackPointersHelper2(List<String> sentence,
 			Chart chart, int i, int j, String parent) {
