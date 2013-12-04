@@ -20,7 +20,7 @@ public class PCFGParserTester {
 
     // Set up default parameters and settings
     String basePath = "data/";
-    boolean verbose = true;
+    boolean verbose = false;
     String testMode = "validate";
     
     // you may want to change this for initial annotation experiments (e.g., maxTrainLength = 10) so that to make debugging
@@ -119,9 +119,9 @@ public class PCFGParserTester {
     EnglishPennTreebankParseEvaluator.LabeledConstituentEval<String> eval = new EnglishPennTreebankParseEvaluator.LabeledConstituentEval<String>(Collections.singleton("ROOT"), new HashSet<String>(Arrays.asList(new String[]{"''", "``", ".", ":", ","})));
     for (Tree<String> testTree : testTrees) {
       List<String> testSentence = testTree.getYield();
-      System.err.println("testSentence is: "+ testSentence);
+  //    System.err.println("testSentence is: "+ testSentence);
       Tree<String> guessedTree = parser.getBestParse(testSentence);
-      System.err.println("guessed tree is: "+ guessedTree);
+ //     System.err.println("guessed tree is: "+ guessedTree);
       if (verbose) {
         System.out.println("Guess:\n" + Trees.PennTreeRenderer.render(guessedTree));
         System.out.println("Gold:\n" + Trees.PennTreeRenderer.render(testTree));

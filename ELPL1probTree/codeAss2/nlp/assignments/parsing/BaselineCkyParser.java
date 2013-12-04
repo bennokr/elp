@@ -217,14 +217,9 @@ class BaselineCkyParser implements Parser {
 					Rule optRule = null;
 					// parent -> c1
 					for (Rule rule: grammar.getUnaryRulesByParent(parent)){
-						if (rule.getChildren()[0].equals(parent)){
-							break;
-						}
 						//NB: reflexive transitive closure!
-						double currScore = Math.log(rule.getScore());
-						for (String child : rule.getChildren()){
-							currScore += chart.get(min, max, child);
-						}
+						double currScore = Math.log(rule.getScore())+chart.get(min, max, rule.getChildren()[0]);
+						
 						if (currScore > bestScore) {
 							bestScore = currScore;
 							optRule = rule;
@@ -232,7 +227,7 @@ class BaselineCkyParser implements Parser {
 
 					}
 
-					if (bestScore != Double.NEGATIVE_INFINITY) { 
+					if (bestScore > chart.get(min, max, parent)) { 
 						chart.set(min, max, parent, bestScore, optRule);
 					}
 				}
