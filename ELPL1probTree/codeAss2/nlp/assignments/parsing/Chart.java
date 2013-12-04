@@ -101,9 +101,6 @@ public class Chart {
 		}
 	}
 
-	EdgeInfo.type getType(int i, int j, String label){
-		return chart.get(i).get(j).get(label).type;
-	}
 	
 	Set<String> getAllCandidateLabels(int i, int j) {
 		return chart.get(i).get(j).keySet();
@@ -122,16 +119,9 @@ public class Chart {
 		return optLabel;
 	}
 
-
-
-
-
-	int getMidPoint(int i, int j, String label) {
-		return chart.get(i).get(j).get(label).mid;
-	}
-
-	Rule getRule(int i, int j, String label) {
-		return chart.get(i).get(j).get(label).rule;
+	
+	EdgeInfo getinfo(int i, int j, String label){
+		return chart.get(i).get(j).get(label);
 	}
 
 	@Override
