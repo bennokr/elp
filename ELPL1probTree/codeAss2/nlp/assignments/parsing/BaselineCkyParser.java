@@ -27,7 +27,7 @@ class BaselineCkyParser implements Parser {
 
 	//	UnaryClosure unaryClosure;
 
-	public class Chart {
+	static class Chart {
 		static class EdgeInfo {
 
 			enum type{PRETERMINAL, UNARY, BINARY};
@@ -305,8 +305,8 @@ class BaselineCkyParser implements Parser {
 							}
 						}
 						if (bestScore != Double.NEGATIVE_INFINITY) { 
-							chart.set(min, max, parent, bestScore);
-							chart.setBackPointer(min, max, parent, optRule, optMid);
+							chart.set(min, max, parent, bestScore, optRule, optMid);
+							
 						}
 					}
 				}
@@ -329,10 +329,8 @@ class BaselineCkyParser implements Parser {
 					}
 
 					if (bestScore != Double.NEGATIVE_INFINITY) { 
-						chart.set(min, max, parent, bestScore);
+						chart.set(min, max, parent, bestScore, optRule);
 						
-						chart.setBackPointer(min, max, parent, optRule, max); //mid = max, convenient for traverseBackPointers
-
 					}
 				}
 			}
