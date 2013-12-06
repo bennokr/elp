@@ -77,7 +77,7 @@ class BaselineCkyParser implements Parser {
 		// the Chart has three set methods, the arguments determine the type
 		// of the EdgeInfo that is created
 		
-		// Not that in our implementation, 
+		// Note that in our implementation, 
 		// the set method also sets  the backpointer
 		void set(int i, int j, String label, double score, Rule rule, int midPoint){
 			chart.get(i).get(j).put(label, new EdgeInfo(score, rule, midPoint));
