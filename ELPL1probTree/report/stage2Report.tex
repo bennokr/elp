@@ -1,5 +1,5 @@
 \documentclass{article}
-\usepackage[margin=1cm,a4paper]{geometry}
+\usepackage[margin=2cm,a4paper]{geometry}
 \usepackage{tikz}
 %\usetikzlibrary{trees}
 \usepackage{program}
@@ -12,7 +12,10 @@ Stage 2: Adding support of Unary Rules in the CKY ALgorithm}
 \begin{document}
 \maketitle
 
-The CKY algorithm was originally implemented for binary rules only. We extended the code to support unary rules.
+The CKY algorithm was originally implemented for binary rules only. We extended the code to support unary rules. To allow for sequences of unary rule applictions, we used the provided class {\tt UnaryClosure}, extending the {\tt Grammar} class to contain all possivle sequences of unary rule applications.
+
+A sentence is only parsed into a tree with unary rules when this leads to a higher probability of the parse. The application of spurious unary rules is not an issue, because thee would always lead to a lower probability.
+ 
 \section{Implementation}
 \paragraph{Grammar}
 \begin{itemize}
@@ -53,11 +56,44 @@ The Parsing algorithm itself is run with the function {\tt getBestParse(List<Str
 
 \end{program}
 \item After performing the CKY parsing, the tree is recovered by traversing the backpointers in the chart. 
-We altered the classes {\tt Chart} and {\tt EdgeInfo} such that an {\tt EdgeInfo} object has a certain {\tt type}: preterminal, unary, or binary. When the {\tt set} function of {\tt Chart} is called with 3, 4, or 5 parameters, the appropriate constructor for {\tt EdgeInfo} is called. The parameters always include the {\tt i} and {\tt j}, the end points of the edge, and {\tt label} its label. The optional arguments are a {\tt Rule} object and a {\tt midpoint}
+We altered the classes {\tt Chart} and {\tt EdgeInfo} such that an {\tt EdgeInfo} object has a certain {\tt type}: preterminal, unary, or binary.
+An instance of {\tt EdgeInfo} with the preterminal type only needs to store its score. The unary {\tt EdgeInfo} also stores the rule that generated it, and the {\tt EdgeInfo} with the binary type extends this by also storing the midpoint of that rule. When the {\tt set} function of {\tt Chart} is called with 3, 4, or 5 parameters, the appropriate constructor for {\tt EdgeInfo} is called. The parameters always include the {\tt i} and {\tt j}, the end points of the edge, and {\tt label} its label. The optional arguments are a {\tt Rule} object and a {\tt midpoint}.
 
-We rewrote the methods {\tt traverseBackPointers} and {\tt traverseBackPointersHelper}. 
+We rewrote the methods {\tt traverseBackPointers} and {\tt traverseBackPointersHelper} to build the tree recursively:
+
+\begin{program}
+\mbox{recursively traverse backpointers, looking up a label $p$ in {\tt chart} between word $i$ and $j$ of {\tt sentence} }
+
+\IF {\tt chart}[i][j][p].type = {\tt preterminal}
+	\mbox{return the tree node $p$ with child node {\tt sentence}$[i]$}
+\FI
+\IF {\tt chart}[i][j][p].type = {\tt unary}
+	c \gets \mbox{traverse backpointers for label }{\tt chart}[i][j][p].child \mbox{ between word $i$ and $j$}
+	\mbox{return the tree node $p$ with child node $c$}
+\FI
+\IF {\tt chart}[i][j][p].type = {\tt binary}
+	m \gets {\tt chart}[i][j][p].midpoint
+	c_1 \gets \mbox{traverse backpointers for label }{\tt chart}[i][j][p].child[1] \mbox{ between word $i$ and $m$}
+    c_2 \gets \mbox{traverse backpointers for label }{\tt chart}[i][j][p].child[2] \mbox{ between word $i$ and $m$}
+	\mbox{return the tree node $p$ with child nodes $c_1$ and $c_2$}
+\FI
+
+\end{program}
+
 \end{itemize}
 
 \section{Results}
+
+We trained the parser on the standard training set, and tested on 1034 trees. For both training and testing, a maximum length of sentences was used of 20 words. The results can be seen below:
+
+
+\begin{tabular}{| l | l |}
+    \hline
+    Precision & 79.56 \\ \hline
+    Recall & 70.55 \\ \hline
+    F1 & 74.79\\ \hline
+    EX & 15.37\\ \hline
+\end{tabular}
+
 
 \end{document}
