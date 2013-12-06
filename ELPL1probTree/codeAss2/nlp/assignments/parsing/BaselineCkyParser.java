@@ -144,13 +144,7 @@ class BaselineCkyParser implements Parser {
 			case UNARY: {
 				String childLabel = edge.rule.getChildren()[0];
 				List<Tree<String>> children;
-				//if (childLabel .equals(parent)){
-//					System.err.print("HELP, my child is named"+childLabel);
-					//children = new ArrayList<Tree<String>>();
-				//}
-		//		else{
-					children = Collections.singletonList(traverseBackPointersHelper(sentence, chart, i, j, childLabel));
-			//	}
+				children = Collections.singletonList(traverseBackPointersHelper(sentence, chart, i, j, childLabel));
 				return new Tree<String>(parent, children);
 			}
 			case BINARY: {

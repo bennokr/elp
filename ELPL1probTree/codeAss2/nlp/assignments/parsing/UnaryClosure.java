@@ -55,11 +55,6 @@ class UnaryClosure {
 		}
 	}
 
-//	public UnaryClosure(Grammar grammar) {
-//
-//		this(grammar.getUnaryRules());
-//	}
-
 	private void addUnary(Rule unaryRule, List<String> path) {
 		CollectionUtils.addToValueList(closedUnaryRulesByChild, unaryRule.getChildren()[0], unaryRule);
 		CollectionUtils.addToValueList(closedUnaryRulesByParent, unaryRule.getParent(), unaryRule);

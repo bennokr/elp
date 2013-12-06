@@ -7,7 +7,6 @@ public class Rule {
 	private String parent;
 	private String[] children;
 	private double score;
-//	private boolean isAnnotated;
 
 	public String getParent() {
 		return parent;
@@ -28,15 +27,7 @@ public class Rule {
 	public void setScore(double score) {
 		this.score = score;
 	}
-/*
-	public void setAnnotated(boolean annotated){
-		this.isAnnotated = annotated;
-	}
 
-	public boolean getAnnotated(){
-		return isAnnotated;
-	}
-*/
 	public boolean equals(Object o) {
 		if (this == o) return true;
 		if (!(o instanceof Rule)) return false;
@@ -69,16 +60,12 @@ public class Rule {
 	}
 
 	public Rule(String parent, String[] children, boolean annotated) {
-		//this.arity = children.length;
 		this.parent = parent;
 		this.children = children;
-		//this.arity = children.length;
-	//	this.isAnnotated = annotated;
 	}
 
 	public void setChildren(String[] children) {
 		this.children = children;
-	//	this.arity = children.length;
 	}
 
 
