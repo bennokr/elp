@@ -1,12 +1,13 @@
 package nlp.assignments.parsing;
 
 public class Rule {
+	// This class is a general rule, so can be binary or unary 
+	// in fact, it could have an even higher arity, although this never occurs in our pipeline 
 
 	private String parent;
-	//private int arity;
 	private String[] children;
 	private double score;
-	private boolean isAnnotated;
+//	private boolean isAnnotated;
 
 	public String getParent() {
 		return parent;
@@ -27,7 +28,7 @@ public class Rule {
 	public void setScore(double score) {
 		this.score = score;
 	}
-
+/*
 	public void setAnnotated(boolean annotated){
 		this.isAnnotated = annotated;
 	}
@@ -35,7 +36,7 @@ public class Rule {
 	public boolean getAnnotated(){
 		return isAnnotated;
 	}
-
+*/
 	public boolean equals(Object o) {
 		if (this == o) return true;
 		if (!(o instanceof Rule)) return false;
@@ -72,7 +73,7 @@ public class Rule {
 		this.parent = parent;
 		this.children = children;
 		//this.arity = children.length;
-		this.isAnnotated = annotated;
+	//	this.isAnnotated = annotated;
 	}
 
 	public void setChildren(String[] children) {

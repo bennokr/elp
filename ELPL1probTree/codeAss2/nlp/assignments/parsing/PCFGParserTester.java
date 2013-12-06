@@ -60,14 +60,11 @@ public class PCFGParserTester {
     
 
     System.out.print("Loading training trees  ... ");
-    //TODO for initial experiments you may choose to load only a subset of the training section, 
-    // rather than entire section 2 - 22 (as standard)
     List<Tree<String>> trainTrees = readTrees(basePath, 200, 2199, maxTrainLength);
+       System.out.println("done. (" + trainTrees.size() + " trees)");
    
-    System.out.println("done. (" + trainTrees.size() + " trees)");
-    List<Tree<String>> testTrees = null;
+       List<Tree<String>> testTrees = null;
     if (testMode.equalsIgnoreCase("validate")) {
-      
       System.out.print("Loading validation trees ... ");
       
       //This is only a subset of the validation set - 393 trees (as used, e.g., in Klein and Manning 2003 for initial experiments)
@@ -93,7 +90,7 @@ public class PCFGParserTester {
     	annotator = new BaselineTreeAnnotations();
     }
     
-    // TODO : Fix the parser to support binary rules
+   
     Parser parser = new BaselineCkyParser(trainTrees, annotator);
 
     if (argMap.containsKey("-scoring-mode")) {
@@ -119,14 +116,13 @@ public class PCFGParserTester {
     EnglishPennTreebankParseEvaluator.LabeledConstituentEval<String> eval = new EnglishPennTreebankParseEvaluator.LabeledConstituentEval<String>(Collections.singleton("ROOT"), new HashSet<String>(Arrays.asList(new String[]{"''", "``", ".", ":", ","})));
     for (Tree<String> testTree : testTrees) {
       List<String> testSentence = testTree.getYield();
-  //    System.err.println("testSentence is: "+ testSentence);
       Tree<String> guessedTree = parser.getBestParse(testSentence);
- //     System.err.println("guessed tree is: "+ guessedTree);
       if (verbose) {
         System.out.println("Guess:\n" + Trees.PennTreeRenderer.render(guessedTree));
         System.out.println("Gold:\n" + Trees.PennTreeRenderer.render(testTree));
       }
       eval.evaluate(guessedTree, testTree);
+
     }
     eval.display(true);
   }
@@ -140,7 +136,6 @@ public class PCFGParserTester {
       Tree<String> normalizedTree = treeTransformer.transformTree(tree);
       if (normalizedTree.getYield().size() > maxLength)
         continue;
-//      System.out.println(Trees.PennTreeRenderer.render(normalizedTree));
       normalizedTreeList.add(normalizedTree);
     }
     return normalizedTreeList;

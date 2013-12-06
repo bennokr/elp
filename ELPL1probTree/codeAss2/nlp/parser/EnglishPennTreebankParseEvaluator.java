@@ -56,21 +56,31 @@ public class EnglishPennTreebankParseEvaluator<L> {
 
 //      guess.pennPrint(pw);
 //      gold.pennPrint(pw);
-      displayPRF(str+" [Current] ", correctSet.size(), guessedSet.size(), goldSet.size(), currentExact, 1, pw);
+      if (displayPRF(str+" [Current] ", correctSet.size(), guessedSet.size(), goldSet.size(), currentExact, 1, pw)){
+    	  
+    	  
+    	  System.out.println("Bad prediction for tree.");
+    	  System.out.println("Guess:\n" + Trees.PennTreeRenderer.render(guess));
+          System.out.println("Gold:\n" + Trees.PennTreeRenderer.render(gold));
+      }
+      
       displayPRF(str+" [Average (up to " + total + ")] ", correctEvents, guessedEvents, goldEvents, exact, total, pw);
 
     }
 
-    private void displayPRF(String prefixStr, int correct, int guessed, int gold, int exact, int total, PrintWriter pw) {
+    private boolean displayPRF(String prefixStr, int correct, int guessed, int gold, int exact, int total, PrintWriter pw) {
       double precision = (guessed > 0 ? correct / (double) guessed : 1.0);
       double recall = (gold > 0 ? correct / (double) gold : 1.0);
       double f1 = (precision > 0.0 && recall > 0.0 ? 2.0 / (1.0 / precision + 1.0 / recall) : 0.0);
 
       double exactMatch = exact / (double) total;
 
+      
+      
       String displayStr = " P: " + ((int) (precision * 10000)) / 100.0 + " R: " + ((int) (recall * 10000)) / 100.0 + " F1: " + ((int) (f1 * 10000)) / 100.0 + " EX: "+((int) (exactMatch * 10000)) / 100.0 ;
 
       pw.println(prefixStr+displayStr);
+      return (((int) (f1 * 10000)) / 100.0<50);
     }
 
     public void display(boolean verbose) {

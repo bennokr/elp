@@ -105,9 +105,6 @@ import nlp.util.Counter;
     	}
     }
 
-   // public Grammar(Grammar grammar){
-  //    }
-
     public Grammar(List<Tree<String>> trainTrees) {
       Counter<Rule> unaryRuleCounter = new Counter<Rule>();
       Counter<Rule> binaryRuleCounter = new Counter<Rule>();

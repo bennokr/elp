@@ -25,13 +25,14 @@ class BaselineCkyParser implements Parser {
 
 	static public class Chart {
 		static enum type{PRETERMINAL, UNARY, BINARY};
-		static class EdgeInfo {
 		
-			type type;
+		static class EdgeInfo {		
+			type type; //the type of the edge is stored (as an enum)
 			double score; 
 			Rule rule = null;
 			int mid = -1;
 			
+			// EdgeInfo has three constructors, the arguments determine its type.
 			EdgeInfo(double score) {
 				this.score = score;
 				this.type = type.PRETERMINAL;
@@ -49,13 +50,15 @@ class BaselineCkyParser implements Parser {
 				this.type = type.BINARY;
 			}
 			
-			@Override
 			public String toString() {
-				if (rule == null) {
-					return Double.toString(score);
-				} else {
-					return score + ": " + "[ rule = " + rule + ", mid = " + mid + "]";
+				String toReturn = ""+score;				
+				switch (type){
+				case PRETERMINAL: break;
+				case UNARY: toReturn+= ": [rule = "+rule;
+				case BINARY: toReturn += ", mid = " + mid;
+				default: toReturn += "]";
 				}
+				return toReturn;
 			}
 	}
 
@@ -71,6 +74,11 @@ class BaselineCkyParser implements Parser {
 			}
 		}
 
+		// the Chart has three set methods, the arguments determine the type
+		// of the EdgeInfo that is created
+		
+		// Not that in our implementation, 
+		// the set method also sets  the backpointer
 		void set(int i, int j, String label, double score, Rule rule, int midPoint){
 			chart.get(i).get(j).put(label, new EdgeInfo(score, rule, midPoint));
 		}
@@ -83,6 +91,8 @@ class BaselineCkyParser implements Parser {
 			chart.get(i).get(j).put(label, new EdgeInfo(score, rule));		
 		}
 		
+		// return the score of the EdgeInfo: the log score of the rule that is used
+		// if there is no rule, return log(0): negative infinity
 		double get(int i, int j, String label) {
 			Map<String,EdgeInfo> edgeScores = chart.get(i).get(j);
 			if (!edgeScores.containsKey(label)) {
@@ -120,6 +130,9 @@ class BaselineCkyParser implements Parser {
 
 	}
 
+	// return a tree with the parent argument as a node
+	// its children are determined by looking up the rule in the chart
+	// and calling the function recursively
 	private Tree<String> traverseBackPointersHelper(
 			List<String> sentence, Chart chart, int i, int j, String parent) {
 		Chart.EdgeInfo edge = chart.getInfo(i, j, parent);
@@ -131,13 +144,13 @@ class BaselineCkyParser implements Parser {
 			case UNARY: {
 				String childLabel = edge.rule.getChildren()[0];
 				List<Tree<String>> children;
-				if (childLabel .equals(parent)){
-					System.err.print("HELP, my child is named"+childLabel);
-					children = new ArrayList<Tree<String>>();
-				}
-				else{
+				//if (childLabel .equals(parent)){
+//					System.err.print("HELP, my child is named"+childLabel);
+					//children = new ArrayList<Tree<String>>();
+				//}
+		//		else{
 					children = Collections.singletonList(traverseBackPointersHelper(sentence, chart, i, j, childLabel));
-				}
+			//	}
 				return new Tree<String>(parent, children);
 			}
 			case BINARY: {
@@ -156,22 +169,12 @@ class BaselineCkyParser implements Parser {
 	}
 
 	Tree<String> traverseBackPointers(List<String> sentence, Chart chart) {
-
 		return traverseBackPointersHelper(sentence, chart, 0, sentence.size(), "ROOT");
-
 	}
 
 
 
 	public Tree<String> getBestParse(List<String> sentence) {
-
-		/*
-		 * TODO
-		 * This method needs to be extended to support unary rules 
-		 * The UnaryClosure class should simplify this task substantially 
-		 */
-
-		// note that chart.get(i, j, c) translates to chart[i][j][c] we used in the slides	
 
 		Chart chart = new Chart(sentence.size());
 
@@ -212,14 +215,12 @@ class BaselineCkyParser implements Parser {
 				}
 				// Try unary rules:
 				for (String parent: grammar.states){
-					
 					double bestScore = Double.NEGATIVE_INFINITY;
 					Rule optRule = null;
 					// parent -> c1
 					for (Rule rule: grammar.getUnaryRulesByParent(parent)){
 						//NB: reflexive transitive closure!
 						double currScore = Math.log(rule.getScore())+chart.get(min, max, rule.getChildren()[0]);
-						
 						if (currScore > bestScore) {
 							bestScore = currScore;
 							optRule = rule;
@@ -235,10 +236,8 @@ class BaselineCkyParser implements Parser {
 		}
 
 
-
 		// use back pointers to create a tree
 		Tree<String> annotatedBestParse = traverseBackPointers(sentence, chart);
-
 		return annotator.unAnnotateTree(annotatedBestParse);
 	}
 
@@ -258,9 +257,6 @@ class BaselineCkyParser implements Parser {
 		grammar = new UnaryClosedGrammar(annotatedTrainTrees);
 		lexicon = new Lexicon(annotatedTrainTrees);
 		System.out.println("done. (" + grammar.getStates().size() + " states)");
-
-		// use the unary closure to support unary rules in the CKY algorithm
-		//unaryClosure = new UnaryClosure(grammar);
 
 	}
 
